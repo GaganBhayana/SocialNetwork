@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-var userSchema = new Schema({
-	email: {
+var tempUserSchema = new Schema({
+  email: {
 		type: String,
 		required: true
 	},
@@ -51,9 +51,12 @@ var userSchema = new Schema({
 	},
 	school: {
 		type: String
-	}
+	},
+  verificationUrl: {
+    type: String
+  }
 });
 
-var User = mongoose.model('user', userSchema);
+var TempUser = mongoose.model('tempUser', tempUserSchema);
 
-module.exports = User;
+module.exports = TempUser;

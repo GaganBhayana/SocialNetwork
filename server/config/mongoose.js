@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 mongoose.promise = global.promise;
 
 //FETCHING MONGODB URI
-const uri = propcess.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI;
 
 //CONNECTING TO DATABASE
 mongoose.connect(uri)

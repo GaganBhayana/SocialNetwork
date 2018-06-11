@@ -2,6 +2,7 @@
 const express = require('express');
 const path = require('path')
 const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
 
 
 //LOADING CONFIG
@@ -32,8 +33,45 @@ app.use(function(req, res, next) {
 require('./server/config/mongoose');
 
 
+//CHECKING nodemailer
+require('./server/config/nodemailer');
+
+
+//LOADING HELPERS
+const emailVerification = require('./server/helpers/emailVerification');
+
+
+
+/***********************************
+                Routes
+***********************************/
+
+app.post('/sign-up', (req, res) => {
+  let newUser = {
+    email: req.body.email,
+    password: req.body.password,
+    name: req.body.name
+  }
+  bcrypt.genSalt(10, (err, salt) => {
+    bcrypt.hash(newUser.password, salt, (err, hash) => {
+      if (err) {
+        console.log(err);
+      } else {
+        newUser.password = hash;
+        emailVerification.sendVerificationMail(req, res, newUser);
+      }
+    });
+  });
+});
+
+app.get('/confirm-email/:url', (req, res) => {
+  let verificationUrl = req.params.url;
+  emailVerification.confirmEmail(req, res, verificationUrl);
+});
+
+
 //SENDING POST BUILD
-app.get(*, (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
 
