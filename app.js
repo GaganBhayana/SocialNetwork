@@ -32,8 +32,12 @@ app.use(function(req, res, next) {
 require('./server/config/mongoose');
 
 
+//CHECKING nodemailer
+require('./server/config/nodemailer');
+
+
 //SENDING POST BUILD
-app.get(*, (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
 
