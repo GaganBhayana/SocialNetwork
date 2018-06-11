@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path')
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 
 //LOADING CONFIG
@@ -41,11 +42,17 @@ require('./server/config/nodemailer');
 const emailVerification = require('./server/helpers/emailVerification');
 
 
+//LOADING MODELS
+const User = require('./server/models/user');
+
+
 
 /***********************************
                 Routes
 ***********************************/
 
+
+//SIGNUP ROUTE
 app.post('/sign-up', (req, res) => {
   let newUser = {
     email: req.body.email,
@@ -64,10 +71,53 @@ app.post('/sign-up', (req, res) => {
   });
 });
 
+
+//CONFIRM EMAIL ROUTE
 app.get('/confirm-email/:url', (req, res) => {
   let verificationUrl = req.params.url;
   emailVerification.confirmEmail(req, res, verificationUrl);
 });
+
+
+//LOGIN ROUTE
+app.post('/login', (req, res) => {
+  User.findOne({
+    email: req.body.email
+  }).then((user) => {
+    if (!user) {
+      res.status(400)
+        .json({
+          success: false,
+          message: 'User not found'
+        });
+    } else if (user) {
+      bcrypt.compare(req.body.password, user.password, (err, result) => {
+        if (!result) {
+          res.status(400)
+            .json({
+              success: false,
+              message: "Email and Password doesn't match"
+            });
+        } else {
+          const payload = {
+            id: user._id,
+          };
+          var token = jwt.sign(payload, process.env.JWT_SECRET);
+          res.status(200)
+            .json({
+              success: true,
+              message: 'Successfully logged in',
+              token,
+            });
+        }
+      });
+    }
+  }).catch((err) => {
+    console.log(err);
+    res.status(500).send();
+  });
+});
+
 
 
 //SENDING POST BUILD
