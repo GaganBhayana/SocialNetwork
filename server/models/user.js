@@ -28,29 +28,26 @@ var userSchema = new Schema({
 	posts: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'post'
-	}]
+	}],
 	pages: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'page'
-	}]
+	}],
 	notifications: [{
 		type: mongoose.Schema.ObjectId,
-		ref: 'notofication'	
-	}]
+		ref: 'notofication'
+	}],
 	location: {
 		type: String,
-		required: true
 	},
 	phone: {
 		type: String
 	},
 	gender: {
 		type: String,
-		required: true 
 	},
 	dob: {
 		type: Date,
-		required: true 
 	},
 	school: {
 		type: String
