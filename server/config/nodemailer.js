@@ -18,11 +18,11 @@ const transporter = nodemailer.createTransport({
 transporter.use('compile', hbs({
   viewEngine: {
     extname: '.handlebars',
-    layoutsDir: 'views/email/',
+    layoutsDir: 'server/views/email/',
     defaultLayout: 'template',
-    partialsDir: 'views/email/partials/'
+    partialsDir: 'server/views/email/partials/'
   },
-  viewPath: 'views/email/body',
+  viewPath: 'server/views/email/body',
   extName: '.handlebars'
 }));
 
