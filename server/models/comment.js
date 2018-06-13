@@ -2,24 +2,21 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 var commentSchema = new Schema({
-	email:{
-		type: String,
-		required: true
-	}
 	content:{
 		type: String,
 		required: true
 	},
 	date: {
-		type: Date
+		type: Date,
+		default: new Date().now()
 	},
-	reaction:[{
+	likes:[{
 		type: mongoose.Schema.ObjectId,
-		ref: 'reaction'
+		ref: 'user'
 	}],
-	subComment:[{
+	comments:[{
 		type: mongoose.Schema.ObjectId,
-		ref: 'comment' //check might get ambigous: comment-> subComment -> subComment ...
+		ref: 'comment'
 	}]
 	owner: {
 		type: mongoose.Schema.ObjectId,

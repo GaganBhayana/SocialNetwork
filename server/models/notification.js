@@ -2,22 +2,17 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 var notificationSchema = new Schema({
-	title: {
-		type: String,
-		required: true
-	}, 
 	content:{
 		type: String,
-		required: true 
+		required: true
 	},
 	date: {
-		type: Date
-	},
-	img: {
-		type: String
+		type: Date,
+		default: new Date().now()
 	},
 	owner: {
 		type: mongoose.Schema.ObjectId,
+		ref: 'user',
 		required: true
 	}
 

@@ -25,6 +25,10 @@ var userSchema = new Schema({
 		type: mongoose.Schema.ObjectId,
 		ref: 'user'
 	}],
+	friendRequests: [{
+		type: mongoose.Schema.ObjectId,
+		ref: 'user'
+	}],
 	posts: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'post'
@@ -35,7 +39,7 @@ var userSchema = new Schema({
 	}],
 	notifications: [{
 		type: mongoose.Schema.ObjectId,
-		ref: 'notofication'
+		ref: 'notification'
 	}],
 	location: {
 		type: String,

@@ -19,12 +19,9 @@ var pageSchema = new Schema({
 		ref: 'user'
 		required: true
 	},
-	date: {
-		type: Date,
-	}
-	reaction: [{
+	likes: [{
 		type: mongoose.Schema.ObjectId,
-		ref: 'reaction'
+		ref: 'user'
 	}]
 });
 

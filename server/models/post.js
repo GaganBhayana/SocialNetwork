@@ -12,9 +12,9 @@ var postSchema = new Schema({
 	img: {
 		type: String
 	},
-	reactions: [{
+	likes: [{
 		type: mongoose.Schema.ObjectId,
-		ref: 'reaction'
+		ref: 'user'
 	}],
 	comments: [{
 		type: mongoose.Schame.ObjectId,
@@ -27,7 +27,7 @@ var postSchema = new Schema({
 	}
 	date: {
 		type: Date,
-		required: true
+		default: new Date().now()
 	}
 });
 

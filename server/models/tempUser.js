@@ -14,46 +14,9 @@ var tempUserSchema = new Schema({
 		type: String,
 		required: true
 	},
-	tagLine: {
-		type: String,
-		default: "Available"
-	},
-	img: {
-		type: String
-	},
-	friends: [{
-		type: mongoose.Schema.ObjectId,
-		ref: 'user'
-	}],
-	posts: [{
-		type: mongoose.Schema.ObjectId,
-		ref: 'post'
-	}],
-	pages: [{
-		type: mongoose.Schema.ObjectId,
-		ref: 'page'
-	}],
-	notifications: [{
-		type: mongoose.Schema.ObjectId,
-		ref: 'notofication'
-	}],
-	location: {
-		type: String,
-	},
-	phone: {
-		type: String
-	},
-	gender: {
-		type: String,
-	},
-	dob: {
-		type: Date,
-	},
-	school: {
-		type: String
-	},
   verificationUrl: {
-    type: String
+    type: String,
+    required: true
   }
 });
 
