@@ -6,7 +6,7 @@ var groupSchema = new Schema({
 		type: String,
 		required: true
 	},
-	descriptiion: {
+	description: {
 		type: String,
 		required: true
 	},
@@ -15,8 +15,8 @@ var groupSchema = new Schema({
 		ref: 'user'
   }],
   posts: [{
-	type: mongoose.Schema.ObjectId,
-	ref: 'post'
+		type: mongoose.Schema.ObjectId,
+		ref: 'post'
 	}],
 	owner : {
 		type: mongoose.Schema.ObjectId,
