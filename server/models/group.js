@@ -13,19 +13,15 @@ var groupSchema = new Schema({
 	members: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'user'
-    }],
-    posts: [{
-		type: mongoose.Schema.ObjectId,
-		ref: 'post'
+  }],
+  posts: [{
+	type: mongoose.Schema.ObjectId,
+	ref: 'post'
 	}],
 	owner : {
 		type: mongoose.Schema.ObjectId,
 		ref: 'user'
-	},
-	likes: [{
-		type: mongoose.Schema.ObjectId,
-		ref: 'user'
-	}]
+	}
 });
 
 var Group = mongoose.model('group', groupSchema);
