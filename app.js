@@ -66,15 +66,15 @@ const User = require('./server/models/user');
 const user = require('./server/routes/user');
 const page = require('./server/routes/page');
 const group = require('./server/routes/group');
-const admin = require('./server/routes/admin'); 
-app.use('/admin',admin);
-app.use('/user',user);
-app.use('/page',page);
-app.use('/group',group);
+const admin = require('./server/routes/admin');
+app.use('/api/admin',admin);
+app.use('/api/user',user);
+app.use('/api/page',page);
+app.use('/api/group',group);
 
 
 //SIGNUP ROUTE
-app.post('/sign-up', (req, res) => {
+app.post('/api/sign-up', (req, res) => {
   let newUser = {
     email: req.body.email,
     password: req.body.password,
@@ -94,14 +94,14 @@ app.post('/sign-up', (req, res) => {
 
 
 //CONFIRM EMAIL ROUTE
-app.get('/confirm-email/:url', (req, res) => {
+app.get('/api/confirm-email/:url', (req, res) => {
   let verificationUrl = req.params.url;
   emailVerification.confirmEmail(req, res, verificationUrl);
 });
 
 
 //LOGIN ROUTE
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => {
   User.findOne({
     email: req.body.email
   }).then((user) => {
@@ -119,7 +119,8 @@ app.post('/login', (req, res) => {
               success: false,
               message: "Email and Password doesn't match"
             });
-        } else {// we check for the authenticity after the password matched
+        } else {
+          // we check for the authenticity after the password matched
           const payload = {
             id: user._id,
           };
