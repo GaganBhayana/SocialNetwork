@@ -8,7 +8,7 @@ var notificationSchema = new Schema({
 	},
 	date: {
 		type: Date,
-		default: new Date().now()
+		default: Date.now()
 	},
 	owner: {
 		type: mongoose.Schema.ObjectId,

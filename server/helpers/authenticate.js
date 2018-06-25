@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../../../models/user');
+const User = require('../models/user');
 
 module.exports = (req, res, next) => {
   var token = req.query.token || req.headers['x-access-token'];
@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
     res.status(400)
     .json({
       success: false,
-      message: 'Token not found'
+      message: 'Token not found' 
     });
   } else {
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
@@ -33,5 +33,21 @@ module.exports = (req, res, next) => {
         });
       }
     });
+  }
+
+  isUser: (req, res, next) => {
+    if (req.isAuthenticated() && req.user.role === 'user') {
+      next();
+    } else {
+      res.send("Error");
+    }
+  }
+
+  isAdmin: (req, res, next) => {
+    if (req.isAuthenticated() && req.user.role === 'admin') {
+      next();
+    } else {
+      res.send("Error");
+    }
   }
 }

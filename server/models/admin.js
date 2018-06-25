@@ -9,11 +9,11 @@ var adminSchema = new Schema({
 	password: {
 		type: String,
 		required: true
-	}
-	isAdmin: {
-		type: Boolean,
-		default: true
-	}
+	},
+	role: {
+		type: String,
+		default: "admin"
+	},
 });
 
 var Admin = mongoose.model('admin', adminSchema);

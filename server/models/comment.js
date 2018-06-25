@@ -8,7 +8,7 @@ var commentSchema = new Schema({
 	},
 	date: {
 		type: Date,
-		default: new Date().now()
+		default: Date.now()
 	},
 	likes:[{
 		type: mongoose.Schema.ObjectId,
@@ -17,7 +17,7 @@ var commentSchema = new Schema({
 	comments:[{
 		type: mongoose.Schema.ObjectId,
 		ref: 'comment'
-	}]
+	}],
 	owner: {
 		type: mongoose.Schema.ObjectId,
 		required: true

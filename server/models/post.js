@@ -22,9 +22,9 @@ var postSchema = new Schema({
 	}],
 	owner: {
 		type: mongoose.Schema.ObjectId,
-		ref: 'user'
+		ref: 'user',
 		required: true
-	}
+	},
 	date: {
 		type: Date,
 		default: new Date().now()

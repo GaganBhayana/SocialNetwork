@@ -21,6 +21,10 @@ var userSchema = new Schema({
 	img: {
 		type: String
 	},
+	role: {
+		type: String,
+		default: "user"
+	},
 	friends: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'user'
@@ -40,6 +44,10 @@ var userSchema = new Schema({
 	notifications: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'notification'
+	}],
+	groups: [{
+		type: mongoose.Schema.ObjectId,
+		ref: 'group'
 	}],
 	location: {
 		type: String,

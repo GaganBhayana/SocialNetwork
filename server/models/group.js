@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-var pageSchema = new Schema({
+var groupSchema = new Schema({
 	title: {
 		type: String,
 		required: true
@@ -10,7 +10,11 @@ var pageSchema = new Schema({
 		type: String,
 		required: true
 	},
-	posts: [{
+	members: [{
+		type: mongoose.Schema.ObjectId,
+		ref: 'user'
+    }],
+    posts: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'post'
 	}],
@@ -24,6 +28,6 @@ var pageSchema = new Schema({
 	}]
 });
 
-var Page = mongoose.model('page', pageSchema);
+var Group = mongoose.model('group', groupSchema);
 
-module.exports = Page;
+module.exports = Group;

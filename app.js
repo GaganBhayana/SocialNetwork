@@ -4,6 +4,11 @@ const path = require('path')
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const methodOverride = require('method-override');
+const flash = require('connect-flash');
+const session = require('express-session');
+const exhbs = require('express-handlebars');
+const passport = require('passport');
 
 
 //LOADING CONFIG
@@ -19,7 +24,15 @@ app.use(bodyParser.urlencoded({
   extended: false
 }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'client/build')));
+app.use(methodOverride('_method'));
+app.use(session({
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: true,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+// app.use(express.static(path.join(__dirname, 'client/build')));
 
 
 //MIDDLEWARE FOR CORS
@@ -50,6 +63,14 @@ const User = require('./server/models/user');
 /***********************************
                 Routes
 ***********************************/
+const user = require('./server/routes/user');
+const page = require('./server/routes/page');
+const group = require('./server/routes/group');
+const admin = require('./server/routes/admin'); 
+app.use('/admin',admin);
+app.use('/user',user);
+app.use('/page',page);
+app.use('/group',group);
 
 
 //SIGNUP ROUTE
@@ -98,7 +119,7 @@ app.post('/login', (req, res) => {
               success: false,
               message: "Email and Password doesn't match"
             });
-        } else {
+        } else {// we check for the authenticity after the password matched
           const payload = {
             id: user._id,
           };
