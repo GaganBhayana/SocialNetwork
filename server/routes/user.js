@@ -228,10 +228,59 @@ router.post('/:id/groups',()=>{
     })
 })
 
+// delete requests
+router.delete('/:id',()=>{
+    User.remove({_id:req.params.id})
+    .then((user)=>{
+        console.log("User removed successfully!");
+    })
+    .catch((err)=>{
+       console.log("User not removed!"); 
+    })
+})
+
+//***************** Also write code to remove from the collection of post,page and group */
+router.delete('/:id/post/:post_id',()=>{
+    User.find({_id:req.params.id})
+    .then((user)=>{
+        user.posts.remove({_id:req.params.post_id});
+    })
+    .then(()=>{
+        console.log('Post removed successfully');
+    })
+    .catch((err)=>{
+        console.log('Post not removed1');
+    })
+});
+
+router.delete('/:id/page/:page_id',()=>{
+    User.find({_id:req.params.id})
+    .then((user)=>{
+        user.pages.remove({_id:req.params.page_id});
+    })
+    .then(()=>{
+        console.log('Page removed successfully');
+    })
+    .catch((err)=>{
+        console.log('Page not removed!');
+    })
+});
+
+router.delete('/:id/group/:group_id',()=>{
+    User.find({_id:req.params.id})
+    .then((user)=>{
+        user.groups.remove({_id:req.params.group_id});
+    })
+    .then(()=>{
+        console.log('Group removed successfully');
+    })
+    .catch((err)=>{
+        console.log('Group not removed!');
+    });
+});
 //  update requests---------------------------------------
 
 
-// delete requests
 
 
 module.exports = router;
