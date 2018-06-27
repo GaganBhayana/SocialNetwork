@@ -21,7 +21,11 @@ var pageSchema = new Schema({
 	likes: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'user'
-	}]
+	}],
+	date: {
+		type: Date,
+		default: Date.now()
+	}
 });
 
 var Page = mongoose.model('page', pageSchema);

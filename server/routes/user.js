@@ -125,7 +125,83 @@ router.get('/:user_id/group/:group_id',(req,res) => {
 
 // post requets -------------------------------------------
 router.post('/',(req,res)=>{// registereing a new user
-    
+    var user= {
+        email: req.body.email,
+        name: req.body.name,
+        tagLine: (req.body.tagLine)?req.body.tagLine:"",
+        img: " ",
+        role: req.body.role,
+        gender: req.body.gender,
+        dob: req.body.dob,
+        location: req.body.location ? req.body.location :"",
+        school: req.body.school ? req.body.school: ""
+    }  
+    User.insert({
+            email:user.email, 
+            name:user.name, 
+            tagLine:user.tagLine,
+            role: user.role,
+            gender: user.gender,
+            dob: user.dob,
+            location: user.location,
+            school: user.school
+        });
+})
+
+router.post('/:id/posts',(req,res)=>{
+    var post = {
+        title: req.body.title,
+        content: req.body.content,
+        img: "",
+        owner: req.params.id,
+        date: req.body.date
+    }
+    User.find({_id:req.params.id})
+    .then((user)=>{
+        user.insert({
+            title: user.title,
+            content: user.content,
+            img: user.img,
+            owner: user.owner,
+            date: user.date
+        })
+    })
+})
+
+router.post('/:id/pages',()=>{
+    var page = {
+        title: req.body.title,
+        description: req.body.content,
+        owner: req.params.id,
+        date: req.body.date
+    }
+    User.find({_id:req.params.id})
+    .then((user)=>{
+        user.insert({
+            title: user.title,
+            description: user.description,
+            owner: user.owner,
+            date: user.date
+        })
+    })
+})
+
+router.post('/:id/groups',()=>{
+    var group = {
+        title: req.body.title,
+        description: req.body.content,
+        owner: req.params.id,
+        date: req.body.date
+    }
+    User.find({_id:req.params.id})
+    .then((user)=>{
+        user.insert({
+            title: user.title,
+            description: user.description,
+            owner: user.owner,
+            date: user.date
+        })
+    })
 })
 
 //  update requests---------------------------------------

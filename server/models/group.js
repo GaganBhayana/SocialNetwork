@@ -21,6 +21,10 @@ var groupSchema = new Schema({
 	owner : {
 		type: mongoose.Schema.ObjectId,
 		ref: 'user'
+	},
+	date: {
+		type: Date,
+		default: Date.now()
 	}
 });
 
