@@ -6,22 +6,26 @@ const Post = require('../models/page');
 const Notification = require('../models/notification');
 
 const express = require('express');
+var querystring = require('querystring');
 const router = express.Router();
 
 const fixed = 10;
 
 
 // get Requests--------------------------------
-router.get('/',(req,res)=>{// dashboard
-        res.send("Welcome user!"); 
+router.get('/:id',(req,res)=>{// dashboard
+    User.find({_id:re.params.id})
+    .then((user)=>{
+        // user.friends
+    }) 
 })
 
 router.get('/:id',(req,res) => {//profile of a user
     // res.send("this is the user"+req.params.id);
     User.find({_id:req.params.id})
     .then((user)=>{
-        user.posts.find({})
-        .limit(fixed)
+        user.posts.find({}).sort({date:-1})
+        .limit(req.param('counter'))
     })
     .then((userPosts)=>{
         res.json(JSON.stringify(userPosts));
@@ -35,8 +39,8 @@ router.get('/:id/pages',(req,res) => {//user pages
     // res.send("these are your pages");
     User.find({_id:req.params.id})
     .then((user)=>{
-        user.pages.find({})
-        .limit(fixed)
+        user.pages.find({}).sort({date:-1})
+        .limit(req.param('counter'))
     })
     .then((userPages)=>{
             res.json(JSON.stringify(userpages));
@@ -64,8 +68,8 @@ router.get('/:id/posts',(req,res) => {
     // res.send("these are your posts");
     User.find({_id:req.params.id})
     .then((user)=>{
-        user.posts.find({})
-        .limit(fixed);
+        user.posts.find({}).sort({date:-1})
+        .limit(req.param('counter'));
     })
     .then((posts)=>{
         res.json(JSON.stringify(posts));
@@ -80,7 +84,7 @@ router.get('/:id/friends',(req,res) => {
     User.find({_id:req.params.id})
     .then((user)=>{
         user.friends.find({})
-        .limit(2*fixed);
+        .limit(req.param('counter'));
     })
     .then((friends)=>{
         res.json(JSON.stringify(friends));
@@ -94,8 +98,8 @@ router.get('/:id/groups',(req,res) => {
     // res.send("these are your groups");
     User.find({_id:req.params.id})
     .then((user)=>{
-        user.groups.find({})
-        .limit(fixed);
+        user.groups.find({}).sort({date:1})
+        .limit(req.param('counter'));
     })
     .then((groups)=>{
         res.json(JSON.stringify(groups));
@@ -120,6 +124,9 @@ router.get('/:user_id/group/:group_id',(req,res) => {
 })
 
 // post requets -------------------------------------------
+router.post('/',(req,res)=>{// registereing a new user
+    
+})
 
 //  update requests---------------------------------------
 module.exports = router;
