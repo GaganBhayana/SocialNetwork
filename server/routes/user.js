@@ -137,15 +137,21 @@ router.post('/',(req,res)=>{// registereing a new user
         school: req.body.school ? req.body.school: ""
     }  
     User.insert({
-            email:user.email, 
-            name:user.name, 
-            tagLine:user.tagLine,
-            role: user.role,
-            gender: user.gender,
-            dob: user.dob,
-            location: user.location,
-            school: user.school
-        });
+        email:user.email, 
+        name:user.name, 
+        tagLine:user.tagLine,
+        role: user.role,
+        gender: user.gender,
+        dob: user.dob,
+        location: user.location,
+        school: user.school
+    })
+    .then(()=>{
+        consols.log("User added successfully");
+    })
+    .catch((err)=>{
+        console.log('error occured: '+err);
+    })
 })
 
 router.post('/:id/posts',(req,res)=>{
@@ -166,6 +172,12 @@ router.post('/:id/posts',(req,res)=>{
             date: user.date
         })
     })
+    .then(()=>{
+        console.log('Post added successfully');
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
 })
 
 router.post('/:id/pages',()=>{
@@ -183,6 +195,12 @@ router.post('/:id/pages',()=>{
             owner: user.owner,
             date: user.date
         })
+    })
+    .then(()=>{
+        console.log('page added successfully');
+    })
+    .catch((err)=>{
+        console.log(err);
     })
 })
 
@@ -202,7 +220,18 @@ router.post('/:id/groups',()=>{
             date: user.date
         })
     })
+    .then(()=>{
+        console.log("Group added successfully");
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
 })
 
 //  update requests---------------------------------------
+
+
+// delete requests
+
+
 module.exports = router;
