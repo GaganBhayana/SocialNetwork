@@ -13,8 +13,8 @@ const fixed = 10;
 
 
 // get Requests--------------------------------
-router.get('/:id',(req,res)=>{// dashboard
-    User.find({_id:re.params.id})
+router.get('/',(req,res)=>{// dashboard
+    User.find({_id:req.user._id})
     .then((user)=>{
         // user.friends
     }) 
@@ -35,9 +35,9 @@ router.get('/:id',(req,res) => {//profile of a user
     })
 }) 
 
-router.get('/:id/pages',(req,res) => {//user pages
+router.get('/pages',(req,res) => {//user pages
     // res.send("these are your pages");
-    User.find({_id:req.params.id})
+    User.find({_id:req.user._id})
     .then((user)=>{
         user.pages.find({}).sort({date:-1})
         .limit(req.param('counter'))
@@ -50,9 +50,9 @@ router.get('/:id/pages',(req,res) => {//user pages
     })
 })
 
-router.get('/:user_id/page/:page_id',(req,res) => {
+router.get('/page/:page_id',(req,res) => {
     // res.send("this is your page");
-    User.find({_id:req.params.user_id})
+    User.find({_id:req.user._id})
     .then((user)=>{
         user.pages.find({_id:req.params.page_id});
     })
@@ -64,9 +64,9 @@ router.get('/:user_id/page/:page_id',(req,res) => {
     })
 })
 
-router.get('/:id/posts',(req,res) => {
+router.get('/posts',(req,res) => {
     // res.send("these are your posts");
-    User.find({_id:req.params.id})
+    User.find({_id:req.user.id})
     .then((user)=>{
         user.posts.find({}).sort({date:-1})
         .limit(req.param('counter'));
@@ -79,9 +79,9 @@ router.get('/:id/posts',(req,res) => {
     })
 })
 
-router.get('/:id/friends',(req,res) => {
+router.get('/friends',(req,res) => {
     // res.send("these are your friends");
-    User.find({_id:req.params.id})
+    User.find({_id:req.user._id})
     .then((user)=>{
         user.friends.find({})
         .limit(req.param('counter'));
@@ -94,9 +94,9 @@ router.get('/:id/friends',(req,res) => {
     })
 })
 
-router.get('/:id/groups',(req,res) => {
+router.get('/groups',(req,res) => {
     // res.send("these are your groups");
-    User.find({_id:req.params.id})
+    User.find({_id:req.user._id})
     .then((user)=>{
         user.groups.find({}).sort({date:1})
         .limit(req.param('counter'));
@@ -109,9 +109,9 @@ router.get('/:id/groups',(req,res) => {
     })
 })
 
-router.get('/:user_id/group/:group_id',(req,res) => {
+router.get('/group/:group_id',(req,res) => {
     // res.send("this is your group");
-    User.find({_id:req.params.user_id})
+    User.find({_id:req.user._id})
     .then((user)=>{
         user.groups.find({_id:req.params.group_id})
     })
@@ -154,7 +154,7 @@ router.post('/',(req,res)=>{// registereing a new user
     })
 })
 
-router.post('/:id/posts',(req,res)=>{
+router.post('/posts',(req,res)=>{
     var post = {
         title: req.body.title,
         content: req.body.content,
@@ -162,7 +162,7 @@ router.post('/:id/posts',(req,res)=>{
         owner: req.params.id,
         date: req.body.date
     }
-    User.find({_id:req.params.id})
+    User.find({_id:req.user._id})
     .then((user)=>{
         user.insert({
             title: user.title,
@@ -180,14 +180,14 @@ router.post('/:id/posts',(req,res)=>{
     })
 })
 
-router.post('/:id/pages',()=>{
+router.post('/pages',()=>{
     var page = {
         title: req.body.title,
         description: req.body.content,
         owner: req.params.id,
         date: req.body.date
     }
-    User.find({_id:req.params.id})
+    User.find({_id:req.user._id})
     .then((user)=>{
         user.insert({
             title: user.title,
@@ -204,14 +204,14 @@ router.post('/:id/pages',()=>{
     })
 })
 
-router.post('/:id/groups',()=>{
+router.post('/groups',()=>{
     var group = {
         title: req.body.title,
         description: req.body.content,
         owner: req.params.id,
         date: req.body.date
     }
-    User.find({_id:req.params.id})
+    User.find({_id:req.user._id})
     .then((user)=>{
         user.insert({
             title: user.title,
@@ -229,8 +229,9 @@ router.post('/:id/groups',()=>{
 })
 
 // delete requests
-router.delete('/:id',()=>{
-    User.remove({_id:req.params.id})
+// thought: put the deleted user in temp database which can be recovered within 30 days if needed
+router.delete('/',()=>{
+    User.remove({_id:req.user._id})
     .then((user)=>{
         console.log("User removed successfully!");
     })
@@ -240,8 +241,8 @@ router.delete('/:id',()=>{
 })
 
 //***************** Also write code to remove from the collection of post,page and group */
-router.delete('/:id/post/:post_id',()=>{
-    User.find({_id:req.params.id})
+router.delete('/post/:post_id',()=>{
+    User.find({_id:req.user._id})
     .then((user)=>{
         user.posts.remove({_id:req.params.post_id});
     })
@@ -253,8 +254,8 @@ router.delete('/:id/post/:post_id',()=>{
     })
 });
 
-router.delete('/:id/page/:page_id',()=>{
-    User.find({_id:req.params.id})
+router.delete('/page/:page_id',()=>{
+    User.find({_id:req.user._id})
     .then((user)=>{
         user.pages.remove({_id:req.params.page_id});
     })
@@ -266,8 +267,8 @@ router.delete('/:id/page/:page_id',()=>{
     })
 });
 
-router.delete('/:id/group/:group_id',()=>{
-    User.find({_id:req.params.id})
+router.delete('/group/:group_id',()=>{
+    User.find({_id:req.user._id})
     .then((user)=>{
         user.groups.remove({_id:req.params.group_id});
     })
@@ -278,9 +279,7 @@ router.delete('/:id/group/:group_id',()=>{
         console.log('Group not removed!');
     });
 });
+
 //  update requests---------------------------------------
-
-
-
 
 module.exports = router;
