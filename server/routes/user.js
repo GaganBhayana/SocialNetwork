@@ -28,9 +28,11 @@ router.get('/:id',(req,res) => {//profile of a user
         .limit(req.param('counter'))
     })
     .then((userPosts)=>{
+        res.status(200);
         res.json(JSON.stringify(userPosts));
     })
     .catch((err)=>{
+        res.status(404);
         console.log(err);
     })
 }) 
@@ -43,9 +45,11 @@ router.get('/pages',(req,res) => {//user pages
         .limit(req.param('counter'))
     })
     .then((userPages)=>{
-            res.json(JSON.stringify(userpages));
+        res.status(200);            
+        res.json(JSON.stringify(userpages));
     })
     .catch((err)=>{
+        res.status(404);
         console.log(err);
     })
 })
@@ -57,9 +61,11 @@ router.get('/page/:page_id',(req,res) => {
         user.pages.find({_id:req.params.page_id});
     })
     .then((page)=>{
+        res.status(200);
         res.json(JSON.stringify(page));
     })
     .catch((err)=>{
+        res.status(404);
         console.log(err);
     })
 })
@@ -72,9 +78,11 @@ router.get('/posts',(req,res) => {
         .limit(req.param('counter'));
     })
     .then((posts)=>{
+        res.status(200);
         res.json(JSON.stringify(posts));
     })
     .catch((err)=>{
+        res.status(404);
         console.log(err);
     })
 })
@@ -87,9 +95,11 @@ router.get('/friends',(req,res) => {
         .limit(req.param('counter'));
     })
     .then((friends)=>{
+        res.status(200);
         res.json(JSON.stringify(friends));
     })
     .catch((err)=>{
+        res.status(404);
         console.log(err);
     })
 })
@@ -102,9 +112,11 @@ router.get('/groups',(req,res) => {
         .limit(req.param('counter'));
     })
     .then((groups)=>{
+        res.status(200);
         res.json(JSON.stringify(groups));
     })
     .catch((err)=>{
+        res.status(404);
         console.log(err);
     })
 })
@@ -116,9 +128,11 @@ router.get('/group/:group_id',(req,res) => {
         user.groups.find({_id:req.params.group_id})
     })
     .then((group)=>{
+        res.status(200);
         res.json(JSON.stringify(group));
     })
     .catch((err)=>{
+        res.status(404);
         console.log(err);
     })
 })
@@ -147,9 +161,11 @@ router.post('/',(req,res)=>{// registereing a new user
         school: user.school
     })
     .then(()=>{
+        res.status(200);
         consols.log("User added successfully");
     })
     .catch((err)=>{
+        res.status(404);
         console.log('error occured: '+err);
     })
 })
@@ -173,9 +189,11 @@ router.post('/posts',(req,res)=>{
         })
     })
     .then(()=>{
+        res.status(200);
         console.log('Post added successfully');
     })
     .catch((err)=>{
+        res.status(404);
         console.log(err);
     })
 })
@@ -197,9 +215,11 @@ router.post('/pages',()=>{
         })
     })
     .then(()=>{
+        res.status(200);
         console.log('page added successfully');
     })
     .catch((err)=>{
+        res.status(404);
         console.log(err);
     })
 })
@@ -221,9 +241,11 @@ router.post('/groups',()=>{
         })
     })
     .then(()=>{
+        res.status(200);
         console.log("Group added successfully");
     })
     .catch((err)=>{
+        res.status(404);
         console.log(err);
     })
 })
@@ -233,9 +255,11 @@ router.post('/groups',()=>{
 router.delete('/',()=>{
     User.remove({_id:req.user._id})
     .then((user)=>{
+        res.status(200);
         console.log("User removed successfully!");
     })
     .catch((err)=>{
+        res.status(404);
        console.log("User not removed!"); 
     })
 })
@@ -247,9 +271,11 @@ router.delete('/post/:post_id',()=>{
         user.posts.remove({_id:req.params.post_id});
     })
     .then(()=>{
+        res.status(200);
         console.log('Post removed successfully');
     })
     .catch((err)=>{
+        res.status(404);
         console.log('Post not removed1');
     })
 });
@@ -260,9 +286,11 @@ router.delete('/page/:page_id',()=>{
         user.pages.remove({_id:req.params.page_id});
     })
     .then(()=>{
+        res.status(200);
         console.log('Page removed successfully');
     })
     .catch((err)=>{
+        res.status(404);
         console.log('Page not removed!');
     })
 });
@@ -273,9 +301,11 @@ router.delete('/group/:group_id',()=>{
         user.groups.remove({_id:req.params.group_id});
     })
     .then(()=>{
+        res.status(200);
         console.log('Group removed successfully');
     })
     .catch((err)=>{
+        res.status(404);
         console.log('Group not removed!');
     });
 });
