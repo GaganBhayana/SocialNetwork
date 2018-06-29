@@ -67,10 +67,12 @@ const user = require('./server/routes/user');
 const page = require('./server/routes/page');
 const group = require('./server/routes/group');
 const admin = require('./server/routes/admin');
-app.use('/api/admin',admin);
-app.use('/api/user',user);
-app.use('/api/page',page);
-app.use('/api/group',group);
+const post = require('./server/routes/post');
+app.use('/api/admin', admin);
+app.use('/api/user', user);
+app.use('/api/page', page);
+app.use('/api/group', group);
+app.use('/api/post', post);
 
 
 //SIGNUP ROUTE
@@ -143,10 +145,10 @@ app.post('/api/login', (req, res) => {
 
 
 //SENDING POST BUILD
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname+'/client/build/index.html'));
-});
-
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname+'/client/build/index.html'));
+// });
+ 
 
 //STARTING SERVER
 const port = process.env.PORT;
