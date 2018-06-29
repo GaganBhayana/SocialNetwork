@@ -17,7 +17,7 @@ var postSchema = new Schema({
 		ref: 'user'
 	}],
 	comments: [{
-		type: mongoose.Schame.ObjectId,
+		type: mongoose.Schema.ObjectId,
 		ref: 'comment'
 	}],
 	owner: {
@@ -27,7 +27,7 @@ var postSchema = new Schema({
 	},
 	date: {
 		type: Date,
-		default: new Date().now()
+		default: new Date()
 	}
 });
 
