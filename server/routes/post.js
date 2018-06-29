@@ -12,12 +12,16 @@ const express = require('express');
 const router = express.Router();
 
 
+//LOADING MIDDLEWARES
+const authenticate = require('../helpers/authenticate');
+
+
 /**********************************************************
                       ROUTES
 **********************************************************/
 
 //FETCHING ALL POSTS OF A USER
-router.get('/', (req, res) => {
+router.get('/', authenticate, (req, res) => {
   const count = req.query.count;
 
   let friends = req.user.friends;
@@ -44,7 +48,7 @@ router.get('/', (req, res) => {
 
 
 //FETCHING POSTS POSTED BY USER
-router.get('/my-posts', (req, res) => {
+router.get('/my-posts', authenticate, (req, res) => {
   const count = req.query.count;
 
   Post.find({
@@ -66,7 +70,7 @@ router.get('/my-posts', (req, res) => {
 
 
 //FETCHING A PARTICULAR POST
-router.get('/:id', (req, res) => {
+router.get('/:id', authenticate, (req, res) => {
   let post = {};
 
   Post.findById(req.params.id)
@@ -90,20 +94,22 @@ router.get('/:id', (req, res) => {
           post.comments[index].comments = subComments;
         });
       });
+      res.status(200)
+        .json(post);
     })
     .catch(err => {
       console.log(err);
-      res.status(200)
-        .json(post);
+      res.status(500)
+        .send();
     });
 });
 
 
 //LIKING A POST
-router.get('/like/:id', (req, res) => {
+router.get('/like/:id', authenticate, (req, res) => {
   Post.findById(req.params.id)
     .then(post => {
-      if (post.likes.includes(req.user._id)) {
+      if (post.likes.indexOf(req.user._id) !== -1) {
         Post.findByIdAndUpdate(req.params.id, {
           $pull: {
             likes: req.user._id
