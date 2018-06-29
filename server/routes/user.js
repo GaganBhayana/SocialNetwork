@@ -28,8 +28,8 @@ router.get('/:id',(req,res) => {//profile of a user
         .limit(req.param('counter'))
     })
     .then((userPosts)=>{
-        res.status(200);
-        res.json(JSON.stringify(userPosts));
+        res.status(200)
+            .json(JSON.stringify(userPosts));
     })
     .catch((err)=>{
         res.status(404);
@@ -45,8 +45,8 @@ router.get('/pages',(req,res) => {//user pages
         .limit(req.param('counter'))
     })
     .then((userPages)=>{
-        res.status(200);            
-        res.json(JSON.stringify(userpages));
+        res.status(200)            
+            .json(JSON.stringify(userpages));
     })
     .catch((err)=>{
         res.status(404);
@@ -61,8 +61,8 @@ router.get('/page/:page_id',(req,res) => {
         user.pages.find({_id:req.params.page_id});
     })
     .then((page)=>{
-        res.status(200);
-        res.json(JSON.stringify(page));
+        res.status(200)
+            .json(JSON.stringify(page));
     })
     .catch((err)=>{
         res.status(404);
@@ -78,8 +78,8 @@ router.get('/posts',(req,res) => {
         .limit(req.param('counter'));
     })
     .then((posts)=>{
-        res.status(200);
-        res.json(JSON.stringify(posts));
+        res.status(200)
+            .json(JSON.stringify(posts));
     })
     .catch((err)=>{
         res.status(404);
@@ -95,8 +95,8 @@ router.get('/friends',(req,res) => {
         .limit(req.param('counter'));
     })
     .then((friends)=>{
-        res.status(200);
-        res.json(JSON.stringify(friends));
+        res.status(200)
+            .json(JSON.stringify(friends));
     })
     .catch((err)=>{
         res.status(404);
@@ -112,8 +112,8 @@ router.get('/groups',(req,res) => {
         .limit(req.param('counter'));
     })
     .then((groups)=>{
-        res.status(200);
-        res.json(JSON.stringify(groups));
+        res.status(200)
+            .json(JSON.stringify(groups));
     })
     .catch((err)=>{
         res.status(404);
@@ -128,8 +128,8 @@ router.get('/group/:group_id',(req,res) => {
         user.groups.find({_id:req.params.group_id})
     })
     .then((group)=>{
-        res.status(200);
-        res.json(JSON.stringify(group));
+        res.status(200)
+            .json(JSON.stringify(group));
     })
     .catch((err)=>{
         res.status(404);
