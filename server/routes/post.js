@@ -141,7 +141,7 @@ router.get('/like/:id', authenticate, (req, res) => {
 
 
 //POSTING A POST
-router.post('/', (req, res) => {
+router.post('/', authenticate, (req, res) => {
   if (!req.body.title) {
     res.status(400)
       .send();
@@ -151,7 +151,7 @@ router.post('/', (req, res) => {
   post.title = req.body.title;
   post.content = req.body.content;
   post.img = req.body.img;
-  post.owner = '5b1e97216e968d4fecb4f0da';
+  post.owner = req.user._id;
 
   new Post(post)
     .save()
