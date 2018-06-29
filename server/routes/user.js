@@ -20,7 +20,8 @@ router.get('/',(req,res)=>{// dashboard
     }) 
 })
 
-router.get('/:id',(req,res) => {//profile of a user
+//profile of a user - anyone logged in can see it
+router.get('/:id',(req,res) => {
     // res.send("this is the user"+req.params.id);
     User.find({_id:req.params.id})
     .then((user)=>{
@@ -37,6 +38,7 @@ router.get('/:id',(req,res) => {//profile of a user
     })
 }) 
 
+// request for getting  the list of all the pages maintained by user.
 router.get('/pages',(req,res) => {//user pages
     // res.send("these are your pages");
     User.find({_id:req.user._id})
@@ -54,6 +56,7 @@ router.get('/pages',(req,res) => {//user pages
     })
 })
 
+// request for getting the page 
 router.get('/page/:page_id',(req,res) => {
     // res.send("this is your page");
     User.find({_id:req.user._id})
@@ -70,6 +73,7 @@ router.get('/page/:page_id',(req,res) => {
     })
 })
 
+// request for getting all the posts (profile page)
 router.get('/posts',(req,res) => {
     // res.send("these are your posts");
     User.find({_id:req.user.id})
@@ -87,6 +91,7 @@ router.get('/posts',(req,res) => {
     })
 })
 
+// request for getting the list of all friends
 router.get('/friends',(req,res) => {
     // res.send("these are your friends");
     User.find({_id:req.user._id})
@@ -104,6 +109,7 @@ router.get('/friends',(req,res) => {
     })
 })
 
+// request for getting a list of all the groups
 router.get('/groups',(req,res) => {
     // res.send("these are your groups");
     User.find({_id:req.user._id})
@@ -121,6 +127,7 @@ router.get('/groups',(req,res) => {
     })
 })
 
+// Request for getting the group main page
 router.get('/group/:group_id',(req,res) => {
     // res.send("this is your group");
     User.find({_id:req.user._id})
@@ -138,7 +145,8 @@ router.get('/group/:group_id',(req,res) => {
 })
 
 // post requets -------------------------------------------
-router.post('/',(req,res)=>{// registereing a new user
+// registereing a new user
+router.post('/',(req,res)=>{
     var user= {
         email: req.body.email,
         name: req.body.name,
@@ -170,6 +178,7 @@ router.post('/',(req,res)=>{// registereing a new user
     })
 })
 
+// making a new post
 router.post('/posts',(req,res)=>{
     var post = {
         title: req.body.title,
@@ -198,6 +207,7 @@ router.post('/posts',(req,res)=>{
     })
 })
 
+// making a new page
 router.post('/pages',()=>{
     var page = {
         title: req.body.title,
@@ -224,6 +234,7 @@ router.post('/pages',()=>{
     })
 })
 
+// making a new group
 router.post('/groups',()=>{
     var group = {
         title: req.body.title,
@@ -252,6 +263,7 @@ router.post('/groups',()=>{
 
 // delete requests
 // thought: put the deleted user in temp database which can be recovered within 30 days if needed
+// removing the user 
 router.delete('/',()=>{
     User.remove({_id:req.user._id})
     .then((user)=>{
@@ -265,6 +277,7 @@ router.delete('/',()=>{
 })
 
 //***************** Also write code to remove from the collection of post,page and group */
+// to remove a post with post id
 router.delete('/post/:post_id',()=>{
     User.find({_id:req.user._id})
     .then((user)=>{
@@ -280,6 +293,7 @@ router.delete('/post/:post_id',()=>{
     })
 });
 
+//to remove a page with page id
 router.delete('/page/:page_id',()=>{
     User.find({_id:req.user._id})
     .then((user)=>{
@@ -295,6 +309,7 @@ router.delete('/page/:page_id',()=>{
     })
 });
 
+//to remove a group with group id
 router.delete('/group/:group_id',()=>{
     User.find({_id:req.user._id})
     .then((user)=>{
@@ -311,5 +326,6 @@ router.delete('/group/:group_id',()=>{
 });
 
 //  update requests---------------------------------------
+// router.put('/')
 
 module.exports = router;
