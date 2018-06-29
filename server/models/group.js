@@ -13,8 +13,8 @@ var groupSchema = new Schema({
 	members: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'user'
-  }],
-  posts: [{
+	}],
+  	posts: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'post'
 	}],

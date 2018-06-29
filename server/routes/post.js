@@ -163,16 +163,24 @@ router.post('/', (req, res) => {
 
 //DELETING A POST
 router.delete('/:id', (req, res) => {
-  Post.findByIdAndRemove(req.params.id)
-    .then(() => {
-      res.status(200)
-        .send();
+  User.find({_id:req.user._id})
+    .then((user)=>{
+        user.posts.remove({_id:req.params.post_id});
     })
-    .catch(err => {
-      console.log(err);
-      res.status(500)
+    .then(()=>{
+      //removing from post database
+      post.findByIdAndRemove(req.params.id)
+    })
+    .then(()=>{
+        res.status(200)
+        .send();
+        console.log('Post removed successfully');
+    })
+    .catch((err)=>{
+        res.status(404)
         .json(err);
-    });
+        console.log('Post not removed1');
+    })
 });
 
 
