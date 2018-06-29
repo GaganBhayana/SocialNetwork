@@ -326,6 +326,46 @@ router.delete('/group/:group_id',()=>{
 });
 
 //  update requests---------------------------------------
-// router.put('/')
+// updating user details
+router.put('/',(req,res)=>{
+    let newUser = req.body;
+    User.findByIdAndUpdate(req.user._id,newUser)
+    .then(()=>{
+        res.status(200);
+        console.log('User details updated successfully!')
+    })  
+    .catch((err)=>{
+        res.status(404);
+        console.log(err+" occured");
+    })
+})
+
+// updating group details
+router.put('/group/:id',(req,res)=>{
+    let newGroup = req.body;
+    Group.findByIdAndUpdate(req.params.id,newGroup)
+    .then(()=>{
+        res.status(200);
+        console.log('Group details updated successfully');
+    })
+    .catch((err)=>{
+        res.status(404);
+        console.log(err+" occured");
+    })
+})
+
+//updating page details
+router.put('/page/:id',(req,res)=>{
+    let newPage = req.body;
+    Group.findByIdAndUpdate(req.params.id,newPage)
+    .then(()=>{
+        res.status(200);
+        console.log('page details updated successfully');
+    })
+    .catch((err)=>{
+        res.status(404);
+        console.log(err+" occured");
+    })
+})
 
 module.exports = router;
