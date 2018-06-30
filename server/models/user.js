@@ -23,7 +23,11 @@ var userSchema = new Schema({
 	},
 	role: {
 		type: String,
+<<<<<<< HEAD
 		default: "user" 
+=======
+		default: "user" 	
+>>>>>>> 01d61aed2ec820ba0b96e2526baed8e8384f66ed
 	},
 	friends: [{
 		type: mongoose.Schema.ObjectId,

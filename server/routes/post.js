@@ -160,17 +160,32 @@ router.post('/', authenticate, (req, res) => {
 
 
 //DELETING A POST
+<<<<<<< HEAD
 router.delete('/:id', authenticate, (req, res) => {
   Post.findByIdAndRemove(req.params.id)
     .then(() => {
       res.status(200)
-        .send();
+=======
+router.delete('/:id', (req, res) => {
+  User.find({_id:req.user._id})
+    .then((user)=>{
+        user.posts.remove({_id:req.params.post_id});
     })
-    .catch(err => {
-      console.log(err);
-      res.status(500)
+    .then(()=>{
+      //removing from post database
+      post.findByIdAndRemove(req.params.id)
+    })
+    .then(()=>{
+        res.status(200)
+>>>>>>> 01d61aed2ec820ba0b96e2526baed8e8384f66ed
+        .send();
+        console.log('Post removed successfully');
+    })
+    .catch((err)=>{
+        res.status(404)
         .json(err);
-    });
+        console.log('Post not removed1');
+    })
 });
 
 
