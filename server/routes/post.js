@@ -84,16 +84,6 @@ router.get('/:id', authenticate, (req, res) => {
     })
     .then(comments => {
       post.comments = comments;
-      post.comments.forEach((comment, index) => {
-        Comment.find({
-          _id: {
-            $in: comment.comments
-          }
-        })
-        .then(subComments => {
-          post.comments[index].comments = subComments;
-        });
-      });
       res.status(200)
         .json(post);
     })
@@ -168,7 +158,7 @@ router.post('/', authenticate, (req, res) => {
 
 
 //DELETING A POST
-router.delete('/:id', (req, res) => {
+router.delete('/:id', authenticate, (req, res) => {
   Post.findByIdAndRemove(req.params.id)
     .then(() => {
       res.status(200)
@@ -183,9 +173,9 @@ router.delete('/:id', (req, res) => {
 
 
 //UPDATING A POST
-router.put('/:id', (req, res) => {
+router.put('/:id', authenticate, (req, res) => {
   let post = req.body;
-  findByIdAndUpdate(req.params.id, post)
+  Post.findByIdAndUpdate(req.params.id, post)
     .then(() => {
       res.status(200)
         .send();
@@ -199,7 +189,7 @@ router.put('/:id', (req, res) => {
 
 
 //COMMENTING ON A POST
-router.post('/comment/:id', (req, res) => {
+router.post('/comment/:id', authenticate, (req, res) => {
   if (!req.body.content) {
     res.status(400)
       .send();
@@ -210,6 +200,7 @@ router.post('/comment/:id', (req, res) => {
     owner: req.user._id
   }).save()
     .then((comment) => {
+      console.log(comment);
       return Post.findByIdAndUpdate(req.params.id, {
         $push: {
           comments: comment._id
@@ -229,7 +220,7 @@ router.post('/comment/:id', (req, res) => {
 
 
 //REPLYING TO A COMMENT
-router.post('/comment/reply/:id', (req, res) => {
+router.post('/comment/reply/:id', authenticate, (req, res) => {
   if (!req.body.content) {
     res.status(400)
       .send();
@@ -249,6 +240,28 @@ router.post('/comment/reply/:id', (req, res) => {
     .then(() => {
       res.status(200)
         .send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .json(err);
+    });
+});
+
+
+//FETCHING REPLYS OF A COMMENT
+router.get('/comment/reply/:id', authenticate, (req, res) => {
+  Comment.findById(req.params.id)
+    .then(comment => {
+      return Comment.find({
+        _id: {
+          $in: comment.comments
+        }
+      });
+    })
+    .then(subComments => {
+      res.status(200)
+        .json(subComments);
     })
     .catch(err => {
       console.log(err);
