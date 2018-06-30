@@ -272,7 +272,7 @@ router.get('/comment/reply/:id', authenticate, (req, res) => {
 
 
 //DELETING A COMMENT
-router.delete('/comment/:id', (req, res) => {
+router.delete('/comment/:id', authenticate, (req, res) => {
   Comment.findByIdAndRemove(req.params.id)
     .then(() => {
       res.status(200)
@@ -287,7 +287,7 @@ router.delete('/comment/:id', (req, res) => {
 
 
 //EDITING A COMMENT
-router.put('/comment/:id', (req, res) => {
+router.put('/comment/:id', authenticate, (req, res) => {
   if (!req.body.content) {
     res.status(400)
       .send();
