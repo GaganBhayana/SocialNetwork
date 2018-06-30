@@ -21,14 +21,35 @@ var commentSchema = new Schema({
 	owner: {
 		type: mongoose.Schema.ObjectId,
 		required: true
+	},
+	parent: {
+		type: mongoose.Schema.ObjectId,
+		required: true
 	}
 });
 
 var Comment = mongoose.model('comment', commentSchema);
 
-commentSchema.pre('remove', (next) => {
-	console.log('Working');
-	next();
+
+
+commentSchema.pre('remove', function(next) {
+	Comment.findByIdAndUpdate(this.parent, {
+		$pull: {
+			comments: this._id
+		}
+	}).then(() => {
+			return Comment.remove({
+				_id: {
+					$in: this.comments
+				}
+			});
+		})
+		.then(() => {
+			next();
+		})
+		.catch(err => {
+			console.log(err);
+		});
 });
 
 module.exports = Comment;

@@ -24,10 +24,10 @@ router.post('/:id', authenticate, (req, res) => {
 
   new Comment({
     content: req.body.content,
-    owner: req.user._id
+    owner: req.user._id,
+    parent: req.params.id
   }).save()
     .then((comment) => {
-      console.log(comment);
       return Post.findByIdAndUpdate(req.params.id, {
         $push: {
           comments: comment._id
@@ -55,7 +55,8 @@ router.post('/reply/:id', authenticate, (req, res) => {
 
   new Comment({
     content: req.body.content,
-    owner: req.user._id
+    owner: req.user._id,
+    parent: req.params.id
   }).save()
     .then((comment) => {
       return Comment.findByIdAndUpdate(req.params.id, {
@@ -135,7 +136,19 @@ router.get('/like/:id', authenticate, (req, res) => {
 
 //DELETING A COMMENT
 router.delete('/:id', authenticate, isOwner, (req, res) => {
-  Comment.findByIdAndRemove(req.params.id)
+  let commentToBeRemoved = {};
+  Comment.findById(req.params.id)
+    .then((comment) => {
+      commentToBeRemoved = {...comment};
+      return comment.remove();
+    })
+    .then(() => {
+      return Post.findByIdAndUpdate(commentToBeRemoved.parent, {
+        $pull: {
+          comments: commentToBeRemoved._id
+        }
+      });
+    })
     .then(() => {
       res.status(200)
         .send();
