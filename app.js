@@ -59,6 +59,8 @@ const emailVerification = require('./server/helpers/emailVerification');
 const User = require('./server/models/user');
 
 
+//LOADING SEED FILES
+require('./server/seed/main');
 
 /***********************************
                 Routes
@@ -148,7 +150,7 @@ app.post('/api/login', (req, res) => {
 // app.get('*', (req, res) => {
 //   res.sendFile(path.join(__dirname+'/client/build/index.html'));
 // });
- 
+
 
 //STARTING SERVER
 const port = process.env.PORT;
