@@ -26,4 +26,9 @@ var commentSchema = new Schema({
 
 var Comment = mongoose.model('comment', commentSchema);
 
+commentSchema.pre('remove', (next) => {
+	console.log('Working');
+	next();
+});
+
 module.exports = Comment;

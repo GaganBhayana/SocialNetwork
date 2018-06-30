@@ -10,6 +10,7 @@ const router = express.Router();
 
 //LOADING MIDDLEWARES
 const authenticate = require('../helpers/authenticate');
+const isOwner = require('../helpers/isOwner').isPostOwner;
 
 
 //MOUNTING COMMENT ROUTE
@@ -160,7 +161,7 @@ router.post('/', authenticate, (req, res) => {
 
 
 //DELETING A POST
-router.delete('/:id', authenticate, (req, res) => {
+router.delete('/:id', authenticate, isOwner, (req, res) => {
   Post.findByIdAndRemove(req.params.id)
     .then(() => {
       res.status(200)
@@ -176,7 +177,7 @@ router.delete('/:id', authenticate, (req, res) => {
 
 
 //UPDATING A POST
-router.put('/:id', authenticate, (req, res) => {
+router.put('/:id', authenticate, isOwner, (req, res) => {
   let post = req.body;
   Post.findByIdAndUpdate(req.params.id, post)
     .then(() => {

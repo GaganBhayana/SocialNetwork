@@ -8,6 +8,7 @@ const Post = require('../models/post');
 
 //LOADING MIDDLEWARES
 const authenticate = require('../helpers/authenticate');
+const isOwner = require('../helpers/isOwner').isCommentOwner;
 
 
 /**********************************************************
@@ -133,7 +134,7 @@ router.get('/like/:id', authenticate, (req, res) => {
 
 
 //DELETING A COMMENT
-router.delete('/:id', authenticate, (req, res) => {
+router.delete('/:id', authenticate, isOwner, (req, res) => {
   Comment.findByIdAndRemove(req.params.id)
     .then(() => {
       res.status(200)
@@ -148,7 +149,7 @@ router.delete('/:id', authenticate, (req, res) => {
 
 
 //EDITING A COMMENT
-router.put('/:id', authenticate, (req, res) => {
+router.put('/:id', authenticate, isOwner, (req, res) => {
   if (!req.body.content) {
     res.status(400)
       .send();
