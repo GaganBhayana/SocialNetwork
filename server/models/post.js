@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Comment = require('./comment');
 
 var postSchema = new Schema({
 	title: {
@@ -31,6 +32,21 @@ var postSchema = new Schema({
 	}
 });
 
-var Post = mongoose.model('post', postSchema);
+postSchema.pre('remove', function(next) {
+	Comment.find({
+		_id: {
+			$in: this.comments
+		}
+	}).then((comments) => {
+			comments.forEach(comment => {
+				comment.remove();
+			});
+			next();
+	}).catch(err => {
+			console.log(err);
+		});
+});
+
+const Post = mongoose.model('post', postSchema);
 
 module.exports = Post;

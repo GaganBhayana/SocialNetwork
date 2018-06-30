@@ -162,17 +162,19 @@ router.post('/', authenticate, (req, res) => {
 
 //DELETING A POST
 router.delete('/:id', authenticate, isOwner, (req, res) => {
-  Post.findByIdAndRemove(req.params.id)
+  Post.findById(req.params.id)
+    .then((post) => {
+      return post.remove();
+    })
     .then(() => {
       res.status(200)
         .send();
-        console.log('Post removed successfully');
     })
-    .catch((err)=>{
-        res.status(404)
+    .catch((err) => {
+      console.log(err);
+      res.status(500)
         .json(err);
-        console.log('Post not removed1');
-    })
+    });
 });
 
 
