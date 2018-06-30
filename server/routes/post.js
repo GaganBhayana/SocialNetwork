@@ -271,6 +271,41 @@ router.get('/comment/reply/:id', authenticate, (req, res) => {
 });
 
 
+//LIKING A COMMENT
+router.get('/comment/like/:id', authenticate, (req, res) => {
+  Comment.findById(req.params.id)
+    .then(comment => {
+      if (comment.likes.indexOf(req.user._id) !== -1) {
+        Comment.findByIdAndUpdate(req.params.id, {
+          $pull: {
+            likes: req.user._id
+          }
+        }).then(() => {
+          res.status(200)
+            .send();
+        }).catch(err => {
+          console.log(err);
+          res.status(500)
+            .json(err);
+        });
+      } else {
+        Comment.findByIdAndUpdate(req.params.id, {
+          $push: {
+            likes: req.user._id
+          }
+        }).then(() => {
+          res.status(200)
+            .send();
+        }).catch(err => {
+          console.log(err);
+          res.status(500)
+            .json(err);
+        });
+      }
+    });
+});
+
+
 //DELETING A COMMENT
 router.delete('/comment/:id', authenticate, (req, res) => {
   Comment.findByIdAndRemove(req.params.id)
