@@ -1,16 +1,12 @@
 //LOADING MODELS
 const User = require('../models/user');
-const Comment = require('../models/comment');
-const Group = require('../models/group');
-const Page = require('../models/page');
-const Post = require('../models/page');
-const Notification = require('../models/notification');
 
 
 //LOADING DEPENDENCIES
 const express = require('express');
 const router = express.Router();
 const authenticate = require('../helpers/authenticate');
+
 
 /***********************************************************
                         ROUTES
@@ -29,9 +25,11 @@ router.get('/', authenticate, (req, res) => {
 
   User.findById(id)
     .then(user => {
-      response = {...user._doc};
-      response.isFriend = user.friends.some(friend => friend.equals(req.user._id));
-      response.friendRequestSent = user.friendRequests.some(request => request.equals(req.user._id));
+      if (user) {
+        response = {...user._doc};
+        response.isFriend = user.friends.some(friend => friend.equals(req.user._id));
+        response.friendRequestSent = user.friendRequests.some(request => request.equals(req.user._id));
+      }
       res.status(200)
         .json(response);
     })
@@ -83,6 +81,38 @@ router.get('/friend-requests', authenticate, (req, res) => {
     .then(friendRequests => {
       res.status(200)
         .json(friendRequests);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
+
+
+//FETCHING FRIENDS SUGGESTIONS
+router.get('/friends/suggestions', authenticate, (req, res) => {
+  let suggestedFriendsIds = [];
+  User.find({
+    _id: {
+      $in: req.user.friends
+    }
+  })
+    .then(friends => {
+      friends.forEach(friend => {
+        suggestedFriendsIds = suggestedFriendsIds.concat(friend.friends);
+      });
+      return User.find({
+        $and: [
+          {_id: {$in: suggestedFriendsIds,}},
+          {_id: {$nin: req.user.friends}},
+          {_id: {$ne: req.user._id}}
+        ]
+      });
+    })
+    .then(suggestedFriends => {
+      res.status(200)
+        .json(suggestedFriends);
     })
     .catch(err => {
       console.log(err);
