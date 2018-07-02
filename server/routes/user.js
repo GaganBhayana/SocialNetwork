@@ -19,7 +19,7 @@ const authenticate = require('../helpers/authenticate');
 //FETCHING DETAILS OF A USER
 router.get('/', authenticate, (req, res) => {
   let id = null;
-
+  let response;
   if (!req.query.id) {
     res.status(200)
       .json(req.user);
@@ -29,13 +29,11 @@ router.get('/', authenticate, (req, res) => {
 
   User.findById(id)
     .then(user => {
-      if (user.friends.indexOf(req.user._id) === -1) {
-        user.isFriend = false;
-      } else {
-        user.isFriend = true;
-      }
+      response = {...user._doc};
+      response.isFriend = user.friends.some(friend => friend.equals(req.user._id));
+      response.friendRequestSent = user.friendRequests.some(request => request.equals(req.user._id));
       res.status(200)
-        .json(user);
+        .json(response);
     })
     .catch(err => {
       console.log(err);
@@ -85,6 +83,54 @@ router.get('/friend-requests', authenticate, (req, res) => {
     .then(friendRequests => {
       res.status(200)
         .json(friendRequests);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
+
+
+//SENDING FRIEND REQUEST
+router.put('/friend-request/send/:id', authenticate, (req, res) => {
+  User.findByIdAndUpdate(req.params.id, {
+    $push: {
+      friendRequests: req.user._id
+    }
+  })
+    .then(() => {
+      res.status(200)
+        .send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
+
+
+//ACCEPTING FRIEND REQUEST
+router.put('/friend-request/accept/:id', authenticate, (req, res) => {
+  User.findByIdAndUpdate(req.user._id, {
+    $pull: {
+      friendRequests: req.params.id
+    },
+    $push: {
+      friends: req.params.id
+    }
+  })
+    .then(() => {
+      return User.findByIdAndUpdate(req.params.id, {
+        $push: {
+          friends: req.user._id
+        }
+      });
+    })
+    .then(() => {
+      res.status(200)
+        .send();
     })
     .catch(err => {
       console.log(err);
