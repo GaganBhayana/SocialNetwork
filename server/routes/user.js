@@ -158,6 +158,51 @@ router.put('/', authenticate, (req, res) => {
 });
 
 
+//DELETING A FRIEND REQEST
+router.delete('/friend-request/:id', authenticate, (req, res) => {
+  User.findByIdAndUpdate(req.user._id, {
+    $pull: {
+      friendRequests: req.params.id
+    }
+  })
+    .then(() => {
+      res.status(200)
+        .send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
+
+
+//DELETING A FRIEND
+router.delete('/friend/:id', authenticate, (req, res) => {
+  User.findByIdAndUpdate(req.user._id, {
+    $pull: {
+      friends: req.params.id
+    }
+  })
+    .then(() => {
+      return User.findByIdAndUpdate(req.params.id, {
+        $pull: {
+          friends: req.user._id
+        }
+      });
+    })
+    .then(() => {
+      res.status(200)
+        .send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
+
+
 //DELETING USER PROFILE
 // TODO: ADD THE DELETED USER IN A DELETED USER MODEL SO THAT THE ACCOUNT
 //CAN BE RECOVERED WITHIN 30 DAYS.
