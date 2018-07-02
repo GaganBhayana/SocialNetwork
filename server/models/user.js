@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Post = require('./post');
 
 var userSchema = new Schema({
 	email: {
@@ -64,6 +65,23 @@ var userSchema = new Schema({
 	school: {
 		type: String
 	}
+});
+
+userSchema.pre('remove', function(next) {
+	Post.find({
+		_id: {
+			$in: this.posts
+		}
+	})
+		.then((posts) => {
+			posts.forEach(post => {
+				post.remove();
+			});
+			next();
+		})
+		.catch(err => {
+			console.log(err);
+		});
 });
 
 var User = mongoose.model('user', userSchema);
