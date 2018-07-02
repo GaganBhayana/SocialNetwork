@@ -25,7 +25,7 @@ router.use('/comment', comment);
 
 //FETCHING ALL POSTS OF A USER
 router.get('/', authenticate, (req, res) => {
-  const count = req.query.count;
+  const count = Number(req.query.count);
 
   let friends = req.user.friends;
   friends.push(req.user._id);
@@ -52,7 +52,7 @@ router.get('/', authenticate, (req, res) => {
 
 //FETCHING POSTS POSTED BY USER
 router.get('/my-posts', authenticate, (req, res) => {
-  const count = req.query.count;
+  const count = Number(req.query.count);
 
   Post.find({
     owner: req.user._id
