@@ -70,11 +70,13 @@ const page = require('./server/routes/page');
 const group = require('./server/routes/group');
 const admin = require('./server/routes/admin');
 const post = require('./server/routes/post');
+const search = require('./server/routes/search');
 app.use('/api/admin', admin);
 app.use('/api/user', user);
 app.use('/api/page', page);
 app.use('/api/group', group);
 app.use('/api/post', post);
+app.use('/api/search', search);
 
 
 //SIGNUP ROUTE
