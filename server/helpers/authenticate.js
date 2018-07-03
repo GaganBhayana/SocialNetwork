@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-
+ 
 module.exports = (req, res, next) => {
   var token = req.query.token || req.headers['x-access-token'];
 
