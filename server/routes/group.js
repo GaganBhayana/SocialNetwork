@@ -124,5 +124,34 @@ router.put('/:id',authenticate,isOwner,(req,res)=>{
     })
 })
 
+// request to become a member of the group
+router.put('/:id/join',authenticate,(req,res)=>{
+
+    Group.find({_id:req.params._id})
+    .then((group)=>{
+        group.update({
+            $push:{
+                members: req.user._id 
+            }
+        })
+        return group._id;
+    })
+    .then((group_id)=>{
+        req.user.ipdate({
+            $push: {
+                groups: group_id
+            }
+        })
+    })
+    .then(()=>{
+        res.status(200)
+            .send();
+    })
+    .catch((err)=>{
+        res.status(400)
+            .send(err);
+    })
+})
+
 module.exports = router;
  
