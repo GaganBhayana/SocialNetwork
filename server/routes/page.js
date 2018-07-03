@@ -100,7 +100,7 @@ router.post('/',authenticate,()=>{
     var page = {
         title: req.body.title,
         description: req.body.content,
-        owner: req.params.id,
+        owner: req.user._id,
         date: req.body.date
     }
     new Page(page)

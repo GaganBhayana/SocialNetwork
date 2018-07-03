@@ -61,7 +61,7 @@ router.post('/',authenticate,(req,res)=>{
     var group = {
         title: req.body.title,
         description: req.body.content,
-        owner: req.params.id,
+        owner: req.user._id,
         date: req.body.date
     }
     new Group(group)
@@ -81,6 +81,7 @@ router.post('/',authenticate,(req,res)=>{
         .json(err);
     })
 })
+
 
 // delete routes
 //to remove a group with group id
@@ -150,6 +151,35 @@ router.put('/:id/join',authenticate,(req,res)=>{
     .catch((err)=>{
         res.status(400)
             .send(err);
+    })
+})
+
+// Request to leave group
+router.put('/:id/leave',authenticate,(req,res)=>{
+    Group.findById(req.params.id)
+    .then((group)=>{
+        group.update({
+            $pull:{
+                members: req.user._id
+            }
+        })
+        return group._id;
+    })
+    .then((group_id)=> {
+        req.user.update({
+            $pull:{
+                groups: group_id
+            }
+        })
+    })
+    .then(()=>{
+        re.status(200)
+            .send();
+    })
+    .catch((err)=>{
+        console.log(err);
+        res.status(400)
+            .send();
     })
 })
 
