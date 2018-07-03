@@ -4,47 +4,48 @@ const Page = require('../models/page');
 const express = require('express');
 const router = express.Router();
 
+// loading middleware
+const authenticate = require('../helpers/authenticate');
+const isOwner = require('../helpers/isOwner').isPageOwner;
+
+
+
 // getting all the pages
 router.get('/',(req,res)=>{
     Page.find({})
-    .limit(req.query.count)
+    .limit(Number(req.query.count))
     .then((pages)=>{
         res.status(200)
             .json(pages);
     })
     .catch((err)=>{
+        console.log("Error occured!");
         res.status(404)
             .send();
-        console.log("Error occured!");
     })
 })
 
 // request for getting  the list of all the pages maintained by user.
-router.get('/my-pages',(req,res) => {//user pages
-    // res.send("these are your pages");
-    User.find({_id:req.user._id})
-    .then((user)=>{
-        user.pages.find({}).sort({date:-1})
-        .limit(req.query.count)
-    })
+router.get('/my-pages',authenticate,(req,res) => {//user pages
+    Page.find({owner:req.user._id})
+    .limit(Number(req.query.count))
+    .sort({date:-1})
     .then((userPages)=>{
         res.status(200)            
             .json(userpages);
     })
     .catch((err)=>{
+        console.log(err);
         res.status(404)
         .send();
-        console.log(err);
     })
 })
 
 // request for getting the page 
-router.get('/:id',(req,res) => {
+router.get('/:id',authenticate,(req,res) => {
     // res.send("this is your page");
-    User.find({_id:req.user._id})
-    .then((user)=>{
-        user.pages.find({_id:req.params.id});
-    })
+
+    Page.find({owner: req.user._id})
     .then((page)=>{
         res.status(200)
             .json(page);
@@ -57,10 +58,11 @@ router.get('/:id',(req,res) => {
 })
 
 //LIKING A PAGE
-router.get('/like/:id', (req, res) => {
+router.get('/like/:id',authenticate, (req, res) => {
     Page.findById(req.params.id)
       .then(page => {
-        if (page.likes.includes(req.user._id)) {
+          // if like a;ready exists
+        if (page.likes.indexOf(req.user._id) !== -1) {
           Page.findByIdAndUpdate(req.params.id, {
             $pull: {
               likes: req.user._id
@@ -94,54 +96,53 @@ router.get('/like/:id', (req, res) => {
 // post requests
 
 // making a new page
-router.post('/pages',()=>{
+router.post('/',authenticate,()=>{
     var page = {
         title: req.body.title,
         description: req.body.content,
         owner: req.params.id,
         date: req.body.date
     }
-    User.find({_id:req.user._id})
-    .then((user)=>{
-        user.insert({
-            title: user.title,
-            description: user.description,
-            owner: user.owner,
-            date: user.date
+    new Page(page)
+    .save()
+    .then(page => {
+        req.user.update({
+            $push: {
+                pages: page._id
+            }
         })
-    })
-    .then(()=>{
-        res.status(200);
-        console.log('page added successfully');
-    })
-    .catch((err)=>{
-        res.status(404)
+        res.status(200)
         .send();
-        console.log(err);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400)
+        .json(err);
     })
 })
 
 //delete request
+
 //to remove a page with page id
-router.delete('/:id',()=>{
-    User.find({_id:req.user._id})
-    .then((user)=>{
-        user.pages.remove({_id:req.params.id});
+router.delete('/:id',authenticate,(req,res)=>{
+    Page.findById(req.params.id)
+    .then((page) => {
+      return page.remove();
     })
-    .then(()=>{
-        //removing from the database
-        page.findByIdAndRemove(req.params.id);
-    })
-    .then(()=>{
-        res.status(200)
+    .then((page) => {
+      req.user.update({
+        $pull:{
+          pages: page._id
+        }
+      })
+      res.status(200)
         .send();
-        console.log('Page removed successfully');
     })
-    .catch((err)=>{
-        console.log('Page not removed!');
-        res.status(404)
+    .catch((err) => {
+      console.log(err);
+      res.status(500)
         .json(err);
-    })
+    });
 });
 
 
@@ -150,14 +151,14 @@ router.put('/:id',(req,res)=>{
     let newPage = req.body;
     Page.findByIdAndUpdate(req.params.id,newPage)
     .then(()=>{
+        console.log('page details updated successfully');
         res.status(200)
         .send();
-        console.log('page details updated successfully');
     })
     .catch((err)=>{
+        console.log(err+" occured");
         res.status(404)
         .json(err);
-        console.log(err+" occured");
     })
 })
 

@@ -149,6 +149,11 @@ router.post('/', authenticate, (req, res) => {
   new Post(post)
     .save()
     .then(post => {
+      req.user.update({
+        $push: {
+          posts: post._id
+        }
+      })
       res.status(200)
         .send();
     })
@@ -166,7 +171,12 @@ router.delete('/:id', authenticate, isOwner, (req, res) => {
     .then((post) => {
       return post.remove();
     })
-    .then(() => {
+    .then((post) => {
+      req.user.update({
+        $pull:{
+          posts: post._id
+        }
+      })
       res.status(200)
         .send();
     })
