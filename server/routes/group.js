@@ -109,7 +109,7 @@ router.delete('/:id',authenticate,isOwner,(req,res)=>{
 // Update routes
 
 // updating group details
-router.put('/:id',authenticate,(req,res)=>{
+router.put('/:id',authenticate,isOwner,(req,res)=>{
     let newGroup = req.body;
     Group.findByIdAndUpdate(req.params.id,newGroup)
     .then(()=>{
