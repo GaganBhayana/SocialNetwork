@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Group = require('../models/group');
+const Post = require('../model/post');
 
 const express = require('express');
 const router = express.Router();
@@ -46,8 +47,7 @@ router.get('/:group_id',(req,res) => {
 
     Group.find({_id: req.params.id})
     .then((group)=>{
-        res.status(200)
-            .json(group);
+    
     })
     .catch((err)=>{
         console.log(err);

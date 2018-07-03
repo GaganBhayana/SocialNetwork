@@ -13,6 +13,12 @@ var postSchema = new Schema({
 	img: {
 		type: String
 	},
+	role: { // this specifies if it is a part of a group or page 
+		type: String
+	},
+	parent: {
+		type: mongoose.Schema.ObjectId
+	},
 	likes: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'user'
@@ -21,7 +27,7 @@ var postSchema = new Schema({
 		type: mongoose.Schema.ObjectId,
 		ref: 'comment'
 	}],
-	owner: {
+	owner: { 
 		type: mongoose.Schema.ObjectId,
 		ref: 'user',
 		required: true
