@@ -41,19 +41,23 @@ router.get('/my-pages',authenticate,(req,res) => {//user pages
     })
 })
 
-// request for getting the page 
-router.get('/:id',authenticate,(req,res) => {
-    // res.send("this is your page");
+// Request for getting the Page -- publicly available
+router.get('/:id',(req,res) => {
 
-    Page.find({owner: req.user._id})
-    .then((page)=>{
+    Post.find({
+        role: "page",
+        parent: req.params.id
+    })
+    .limit(req.query.count)
+    .sort({date:-1})
+    .then((posts)=>{
         res.status(200)
-            .json(page);
+            .json(posts);
     })
     .catch((err)=>{
+        console.log(err);
         res.status(404)
         .send();
-        console.log(err);
     })
 })
 
@@ -91,7 +95,6 @@ router.get('/like/:id',authenticate, (req, res) => {
         }
       });
   });
-
 
 // post requests
 

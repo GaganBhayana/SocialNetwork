@@ -42,12 +42,18 @@ router.get('/my-groups',authenticate,(req,res) => {
 })
 
 
-// Request for getting the group main page
-router.get('/:group_id',(req,res) => {
+// Request for getting the group main page - publicly available
+router.get('/:id',(req,res) => {
 
-    Group.find({_id: req.params.id})
-    .then((group)=>{
-    
+    Post.find({
+        role: "group",
+        parent: req.params.id
+    })
+    .limit(req.query.count)
+    .sort({date: -1})
+    .then((posts)=>{
+        res.status(200)
+            .json(posts);
     })
     .catch((err)=>{
         console.log(err);
