@@ -124,7 +124,7 @@ router.post('/',authenticate,()=>{
 //delete request
 
 //to remove a page with page id
-router.delete('/:id',authenticate,(req,res)=>{
+router.delete('/:id',authenticate,isOwner,(req,res)=>{
     Page.findById(req.params.id)
     .then((page) => {
       return page.remove();
@@ -147,7 +147,7 @@ router.delete('/:id',authenticate,(req,res)=>{
 
 
 // Update routes
-router.put('/:id',(req,res)=>{
+router.put('/:id',authenticate,isOwner,(req,res)=>{
     let newPage = req.body;
     Page.findByIdAndUpdate(req.params.id,newPage)
     .then(()=>{
