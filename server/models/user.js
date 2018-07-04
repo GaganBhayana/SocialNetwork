@@ -50,6 +50,10 @@ var userSchema = new Schema({
 		type: mongoose.Schema.ObjectId,
 		ref: 'group'
 	}],
+	pageFollowed:[{
+		type: mongoose.Schema.ObjectId,
+		ref: 'page'
+	}],
 	location: {
 		type: String,
 	},

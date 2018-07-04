@@ -165,4 +165,33 @@ router.put('/:id',authenticate,isOwner,(req,res)=>{
     })
 })
 
+// adding a new follower
+router.put('/:id/follow',authenticate,(req,res)=>{
+    Page.findById(req.params.id)
+    .then(page=>{
+        page.update({
+            $push: {
+                followers: req.user._id
+            }
+        })
+        return page._id;
+    })
+    .then((page_id)=>{
+            req.user.update({
+                $push:{
+                    pageFollowed: page_id
+                }
+            })
+    })
+    .then(()=>{
+        res.status(200)
+            .send();
+    })
+    .catch(()=>{
+        res.status(400)
+            .send();
+    })
+})
+
+
 module.exports = router; 
