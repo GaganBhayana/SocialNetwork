@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Comment = require('./comment');
+const User = require('./user');
 
 var postSchema = new Schema({
 	title: {
@@ -13,7 +14,7 @@ var postSchema = new Schema({
 	img: {
 		type: String
 	},
-	role: { // this specifies if it is a part of a group or page 
+	role: { // this specifies if it is a part of a group or page
 		type: String
 	},
 	parent: {
@@ -27,7 +28,7 @@ var postSchema = new Schema({
 		type: mongoose.Schema.ObjectId,
 		ref: 'comment'
 	}],
-	owner: { 
+	owner: {
 		type: mongoose.Schema.ObjectId,
 		ref: 'user',
 		required: true
@@ -52,6 +53,7 @@ postSchema.pre('remove', function(next) {
 			console.log(err);
 		});
 });
+
 
 const Post = mongoose.model('post', postSchema);
 

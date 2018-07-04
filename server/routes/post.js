@@ -1,6 +1,7 @@
 //LOADING MODELS
 const Comment = require('../models/comment');
 const Post = require('../models/post');
+const User = require('../models/user');
 
 
 //LOADING DEPENDENCIES
@@ -23,21 +24,37 @@ router.use('/comment', comment);
                       ROUTES
 **********************************************************/
 
-//FETCHING ALL POSTS OF A USER
+//FETCHING ALL POSTS FOR A USER
 router.get('/', authenticate, (req, res) => {
-  const count = Number(req.query.count);
-
   let friends = req.user.friends;
   friends.push(req.user._id);
 
-  Post.find({
-    owner: {
-      $in: friends
+  let query = {};
+
+  if (req.query.parent) {
+    query = {
+      parent: req.query.parent
     }
-  }).sort({
+  } else {
+    query = {
+      $or: [
+        {
+          $and:[
+            {owner: {$in: friends}},
+            {role: 'normal'}
+          ]
+        },
+        {parent: {$in: req.user.pages}},
+        {parent: {$in: req.user.groups}}
+      ]
+    }
+  }
+
+  Post.find(query)
+    .sort({
       date: -1
     })
-    .limit(count)
+    .limit(Number(req.query.count))
     .then(posts => {
       res.status(200)
         .json(posts);
@@ -52,14 +69,12 @@ router.get('/', authenticate, (req, res) => {
 
 //FETCHING POSTS POSTED BY USER
 router.get('/my-posts', authenticate, (req, res) => {
-  const count = Number(req.query.count);
-
   Post.find({
     owner: req.user._id
   }).sort({
     date: -1
   })
-    .limit(count)
+    .limit(Number(req.query.count))
     .then(posts => {
       res.status(200)
         .json(posts);
@@ -145,15 +160,37 @@ router.post('/', authenticate, (req, res) => {
   post.content = req.body.content;
   post.img = req.body.img;
   post.owner = req.user._id;
+  post.role = req.query.role || 'normal';
+  post.parent = req.query.parent;
+
+  let savedPost = null;
 
   new Post(post)
     .save()
-    .then(post => {
-      req.user.update({
+    .then((post) => {
+      savedPost = post;
+      return User.findByIdAndUpdate(req.user._id, {
         $push: {
           posts: post._id
         }
-      })
+      });
+    })
+    .then(() => {
+      if (role === 'group') {
+        Group.findByIdAndUpdate(req.query.parent, {
+          $push: {
+            posts: savedPost._id
+          }
+        });
+      } else {
+        Page.findByIdAndUpdate(req.query.parent, {
+          $push: {
+            posts: savedPost._id
+          }
+        });
+      }
+    })
+    .then(() => {
       res.status(200)
         .send();
     })
