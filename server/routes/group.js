@@ -1,193 +1,232 @@
+//LOADING MODELS
 const User = require('../models/user');
 const Group = require('../models/group');
-const Post = require('../model/post');
+const Post = require('../models/post');
 
+
+//LOADING DEPENDENCIES
 const express = require('express');
 const router = express.Router();
 
-//loading middlewares
+
+//LOADING MIDDLEWARES
 const authenticate = require('../helpers/authenticate');
 const isOwner = require('../helpers/isOwner').isGroupOwner;
 
-// getting all the groups
-router.get('/',(req,res)=>{
+
+/**************************************************
+                    ROUTES
+**************************************************/
+
+//FETCHING ALL GROUPS
+router.get('/', authenticate, (req, res) => {
     Group.find({})
-    .limit(Number(req.query.count))
-    .then((groups)=>{
-        res.status(200)
+      .limit(Number(req.query.count))
+      .then((groups)=>{
+          res.status(200)
             .json(groups);
-    })
-    .catch((err)=>{
-        console.log("Error occured!");
-        res.status(404)
-        .send();
-    })
-})
+      })
+      .catch(err => {
+          console.log(err);
+          res.status(500)
+            .send();
+      });
+});
 
-// request for getting a list of all the groups
-router.get('/my-groups',authenticate,(req,res) => {
 
-    Group.find({owner: req.user._id})
+//FETCHING GROUPS CREATED AND JOINED BY USER
+router.get('/my-groups', authenticate, (req, res) => {
+  let response = {};
+  Group.find({
+    owner: req.user._id
+  })
     .sort({date:-1})
-    .limit(Number(req.query.count))
-    .then((groups)=>{
-        res.status(200)
-            .json(groups);
+    .then(createdGroups => {
+      response.createdGroups = createdGroups;
+      return Group.find({
+        $and: [
+          {_id: {$in: req.user.groups}},
+          {owner: {$not: req.user._id}}
+        ]
+      });
     })
-    .catch((err)=>{
-        console.log(err);
-        res.status(404)
-        .send();
-    })
-})
-
-
-// Request for getting the group main page - publicly available
-router.get('/:id',(req,res) => {
-
-    Post.find({
-        role: "group",
-        parent: req.params.id
-    })
-    .limit(req.query.count)
     .sort({date: -1})
-    .then((posts)=>{
-        res.status(200)
-            .json(posts);
-    })
-    .catch((err)=>{
-        console.log(err);
-        res.status(404)
-        .send();
-    })
-})
-
-// making a new group
-router.post('/',authenticate,(req,res)=>{
-    var group = {
-        title: req.body.title,
-        description: req.body.content,
-        owner: req.user._id,
-        date: req.body.date
-    }
-    new Group(group)
-    .save()
-    .then(group => {
-        req.user.update({
-            $push: {
-                groups: group._id
-            }
-        })
-        res.status(200)
-        .send();
+    .limit(Number(req.query.count))
+    .then(joinedGroups => {
+      response.joinedGroups = joinedGroups;
+      res.status(200)
+        .json(response);
     })
     .catch(err => {
       console.log(err);
-      res.status(400)
-        .json(err);
-    })
-})
-
-
-// delete routes
-//to remove a group with group id
-router.delete('/:id',authenticate,isOwner,(req,res)=>{
-
-    Group.remove({_id:req.params.id})
-    .then((group)=>{
-        req.user.update({
-            $pull: {
-                groups: group._id
-            }
-        })
-    })
-    .then(()=>{
-        console.log('Group removed successfully');
-        res.status(200)
+      res.status(500)
         .send();
-    })
-    .catch((err)=>{
-        console.log('Group not removed!');
-        res.status(404)
-        .json(err);
     });
 });
 
-// Update routes
 
-// updating group details
-router.put('/:id',authenticate,isOwner,(req,res)=>{
-    let newGroup = req.body;
-    Group.findByIdAndUpdate(req.params.id,newGroup)
-    .then(()=>{
-        console.log('Group details updated successfully');
-        res.status(200)
+//FETCHING DETAILS OF A GROUP
+router.get('/:id',(req,res) => {
+  Group.findById(req.params.id)
+    .then(group => {
+      res.status(200)
+        .json(group);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
         .send();
-    })
-    .catch((err)=>{
-        console.log(err+" occured");
-        res.status(404)
-        .json(err);
-    })
-})
+    });
+});
 
-// request to become a member of the group
-router.put('/:id/join',authenticate,(req,res)=>{
 
-    Group.find({_id:req.params._id})
-    .then((group)=>{
-        group.update({
-            $push:{
-                members: req.user._id 
-            }
-        })
-        return group._id;
+//FETCHING MEMBERS OF A GROUP
+router.get('/members/:id', (req, res) => {
+  Group.findById(req.params.id)
+    .then(group => {
+      return User.find({
+        _id: {
+          $in: group.members
+        }
+      });
     })
-    .then((group_id)=>{
-        req.user.ipdate({
-            $push: {
-                groups: group_id
-            }
-        })
+    .then(members => {
+      res.status(200)
+        .json(members);
     })
-    .then(()=>{
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
+
+
+//CREATING A NEW GROUP
+router.post('/', authenticate, (req, res) => {
+    if (!title) {
+      res.status(400)
+        .send();
+    }
+
+    new Group({
+      title: req.body.title,
+      description: req.body.content,
+      owner: req.user._id,
+    })
+      .save()
+      .then(group => {
+          req.user.update({
+              $push: {
+                  groups: group._id
+              }
+          })
+          res.status(200)
+          .send();
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500)
+          .json(err);
+      });
+});
+
+
+//DELETING A GROUP BY ID
+router.delete('/:id', authenticate, isOwner, (req, res) => {
+    Group.remove({
+      _id:req.params.id
+    })
+      .then(group => {
+        req.user.update({
+          $pull: {
+            groups: group._id
+          }
+        });
+      })
+      .then(() => {
         res.status(200)
-            .send();
-    })
-    .catch((err)=>{
-        res.status(400)
-            .send(err);
-    })
-})
+          .send();
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500)
+          .json(err);
+      });
+});
 
-// Request to leave group
-router.put('/:id/leave',authenticate,(req,res)=>{
-    Group.findById(req.params.id)
-    .then((group)=>{
+
+//UPDATING GROUP DETAILS
+router.put('/:id', authenticate, isOwner, (req, res) => {
+    Group.findByIdAndUpdate(req.params.id,req.body)
+      .then(() => {
+        res.status(200)
+          .send();
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500)
+          .json(err);
+      });
+});
+
+//JOINING A GROUP
+router.put('/join/:id', authenticate, (req, res) => {
+    Group.findById(req.params._id)
+      .then(group => {
         group.update({
-            $pull:{
+          $push:{
+            members: req.user._id
+          }
+        });
+        return group._id;
+      })
+      .then(groupId => {
+        return req.user.update({
+          $push: {
+            groups: groupId
+          }
+        });
+      })
+      .then(() => {
+        res.status(200)
+          .send();
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500)
+          .send(err);
+      });
+});
+
+
+//LEAVING A GROUP
+router.put('/leave/:id', authenticate, (req, res) => {
+    Group.findById(req.params.id)
+    .then(group => {
+        group.update({
+            $pull: {
                 members: req.user._id
             }
         })
         return group._id;
     })
-    .then((group_id)=> {
-        req.user.update({
-            $pull:{
-                groups: group_id
-            }
-        })
+    .then(groupId => {
+      return req.user.update({
+        $pull: {
+          groups: groupId
+        }
+      })
     })
-    .then(()=>{
-        re.status(200)
-            .send();
+    .then(() => {
+      res.status(200)
+        .send();
     })
-    .catch((err)=>{
-        console.log(err);
-        res.status(400)
-            .send();
-    })
-})
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
 
 module.exports = router;
- 
