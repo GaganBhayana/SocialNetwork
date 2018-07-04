@@ -165,33 +165,56 @@ router.put('/:id',authenticate,isOwner,(req,res)=>{
     })
 })
 
-// adding a new follower
+// adding or removing a new follower
 router.put('/:id/follow',authenticate,(req,res)=>{
     Page.findById(req.params.id)
     .then(page=>{
-        page.update({
-            $push: {
-                followers: req.user._id
-            }
-        })
-        return page._id;
-    })
-    .then((page_id)=>{
-            req.user.update({
-                $push:{
-                    pageFollowed: page_id
+        if(page.followers.indexOf(req.user._id)!=-1)// already a follower
+        {
+            page.update({
+                $pull: {
+                    followers: req.user._id
                 }
             })
-    })
-    .then(()=>{
-        res.status(200)
-            .send();
-    })
-    .catch(()=>{
-        res.status(400)
-            .send();
+            .then(()=>{
+                req.user.update({
+                    $pull:{
+                        pageFollowed: page._id
+                    }
+                })
+            })
+            .then(()=>{
+                res.status(200)
+                    .send();
+            })    
+            .catch((err)=>{
+                res.status(200)
+                    .send();
+            })
+        }
+        else{
+            page.update({
+                $push: {
+                    followers: req.user._id
+                }
+            })
+            .then(()=>{
+                req.user.update({
+                    $push:{
+                        pageFollowed: page._id
+                    }
+                })
+            })
+            .then(()=>{
+                res.status(200)
+                    .send();
+            })    
+            .catch((err)=>{
+                res.status(200)
+                    .send();
+            })
+        }        
     })
 })
-
 
 module.exports = router; 
