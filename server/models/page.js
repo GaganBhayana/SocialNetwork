@@ -22,6 +22,10 @@ var pageSchema = new Schema({
 		type: mongoose.Schema.ObjectId,
 		ref: 'user'
 	}],
+	followers: [{
+		type:  mongoose.Schema.ObjectId,
+		ref: 'user'
+	}],
 	date: {
 		type: Date,
 		default: Date.now()
