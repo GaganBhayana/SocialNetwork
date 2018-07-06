@@ -46,12 +46,12 @@ router.get('/my-groups', authenticate, (req, res) => {
       return Group.find({
         $and: [
           {_id: {$in: req.user.groups}},
-          {owner: {$not: req.user._id}}
+          {owner: {$ne: req.user._id}}
         ]
-      });
+      })
+      .sort({date: -1})
+      .limit(Number(req.query.count));
     })
-    .sort({date: -1})
-    .limit(Number(req.query.count))
     .then(joinedGroups => {
       response.joinedGroups = joinedGroups;
       res.status(200)
@@ -66,14 +66,16 @@ router.get('/my-groups', authenticate, (req, res) => {
 
 
 //FETCHING DETAILS OF A GROUP
-router.get('/:id',(req,res) => {
+router.get('/:id', authenticate, (req,res) => {
+  let response = {};
   Group.findById(req.params.id)
     .then(group => {
+      response = group._doc;
+      response.joined = !(group.members.indexOf(req.user._id) === -1);
       res.status(200)
-        .json(group);
+        .json(response);
     })
     .catch(err => {
-      console.log(err);
       res.status(500)
         .send();
     });
@@ -104,24 +106,33 @@ router.get('/members/:id', (req, res) => {
 
 //CREATING A NEW GROUP
 router.post('/', authenticate, (req, res) => {
-    if (!title) {
+    if (!req.body.title) {
       res.status(400)
         .send();
     }
 
     new Group({
       title: req.body.title,
-      description: req.body.content,
+      description: req.body.description,
       owner: req.user._id,
     })
       .save()
       .then(group => {
-          req.user.update({
-              $push: {
-                  groups: group._id
-              }
-          })
-          res.status(200)
+          return Group.findByIdAndUpdate(group._id, {
+            $push: {
+              members: req.user._id
+            }
+          });
+      })
+      .then(group => {
+        return req.user.update({
+            $push: {
+                groups: group._id
+            }
+        });
+      })
+      .then(() => {
+        res.status(200)
           .send();
       })
       .catch(err => {
@@ -134,25 +145,34 @@ router.post('/', authenticate, (req, res) => {
 
 //DELETING A GROUP BY ID
 router.delete('/:id', authenticate, isOwner, (req, res) => {
-    Group.remove({
-      _id:req.params.id
-    })
-      .then(group => {
-        req.user.update({
-          $pull: {
-            groups: group._id
-          }
-        });
-      })
-      .then(() => {
-        res.status(200)
-          .send();
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(500)
-          .json(err);
+  let groupToBeDelted = null;
+  Group.findById(req.params.id)
+    .then(group => {
+      groupToBeDeleted = group;
+      return User.update({
+        _id: {
+          $in: groupToBeDeleted.members
+        }
+      }, {
+        $pull: {
+          groups: groupToBeDeleted._id
+        }
+      }, {
+        multi: true
       });
+    })
+    .then(() => {
+      return groupToBeDeleted.remove();
+    })
+    .then(() => {
+      res.status(200)
+        .send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .json(err);
+    });
 });
 
 
@@ -172,16 +192,17 @@ router.put('/:id', authenticate, isOwner, (req, res) => {
 
 //JOINING A GROUP
 router.put('/join/:id', authenticate, (req, res) => {
-    Group.findById(req.params._id)
+    let groupId = null;
+    Group.findById(req.params.id)
       .then(group => {
-        group.update({
+        groupId = group._id;
+        return group.update({
           $push:{
             members: req.user._id
           }
         });
-        return group._id;
       })
-      .then(groupId => {
+      .then(() => {
         return req.user.update({
           $push: {
             groups: groupId
@@ -202,21 +223,22 @@ router.put('/join/:id', authenticate, (req, res) => {
 
 //LEAVING A GROUP
 router.put('/leave/:id', authenticate, (req, res) => {
+  let groupId = null;
     Group.findById(req.params.id)
     .then(group => {
-        group.update({
-            $pull: {
-                members: req.user._id
-            }
-        })
-        return group._id;
+      groupId = group._id;
+      return group.update({
+        $pull: {
+          members: req.user._id
+        }
+      });
     })
-    .then(groupId => {
+    .then(() => {
       return req.user.update({
         $pull: {
           groups: groupId
         }
-      })
+      });
     })
     .then(() => {
       res.status(200)
