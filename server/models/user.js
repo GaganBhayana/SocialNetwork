@@ -50,10 +50,6 @@ var userSchema = new Schema({
 		type: mongoose.Schema.ObjectId,
 		ref: 'group'
 	}],
-	pageFollowed:[{
-		type: mongoose.Schema.ObjectId,
-		ref: 'page'
-	}],
 	location: {
 		type: String,
 	},
@@ -70,6 +66,8 @@ var userSchema = new Schema({
 		type: String
 	}
 });
+
+var User = mongoose.model('user', userSchema);
 
 userSchema.pre('remove', function(next) {
 	Post.find({
@@ -88,6 +86,26 @@ userSchema.pre('remove', function(next) {
 		});
 });
 
-var User = mongoose.model('user', userSchema);
+userSchema.post('remove', function() {
+	User.find({
+		_id: {
+			$in: this.friends
+		}
+	})
+		.then(users => {
+			users.forEach(user => {
+				user.update({
+					$pull: {
+						friends: this._id
+					}
+				})
+					.then('updated');
+			});
+			console.log('Done');
+		})
+		.catch(err => {
+			console.log(err);
+		});
+})
 
 module.exports = User;
