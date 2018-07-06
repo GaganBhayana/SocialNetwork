@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Post = require('./post');
 
 var pageSchema = new Schema({
 	title: {
 		type: String,
 		required: true
 	},
-	descriptiion: {
+	description: {
 		type: String,
 		required: true
 	},
@@ -16,7 +17,8 @@ var pageSchema = new Schema({
 	}],
 	owner : {
 		type: mongoose.Schema.ObjectId,
-		ref: 'user'
+		ref: 'user',
+		required: true
 	},
 	likes: [{
 		type: mongoose.Schema.ObjectId,
@@ -30,6 +32,23 @@ var pageSchema = new Schema({
 		type: Date,
 		default: Date.now()
 	}
+});
+
+pageSchema.pre('remove', function(next) {
+	Post.find({
+		_id: {
+			$in: this.posts
+		}
+	})
+		.then(posts => {
+			posts.forEach(post => {
+				post.remove();
+			});
+			next();
+		})
+		.catch(err => {
+			console.log(err);
+		});
 });
 
 var Page = mongoose.model('page', pageSchema);

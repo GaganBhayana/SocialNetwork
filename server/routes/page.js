@@ -1,143 +1,184 @@
+//LOADING MODELS
 const User = require('../models/user');
 const Page = require('../models/page');
 
+
+//LOADING DEPENDENCIES
 const express = require('express');
 const router = express.Router();
 
-// loading middleware
+
+//LOADING MIDDLEWARES
 const authenticate = require('../helpers/authenticate');
 const isOwner = require('../helpers/isOwner').isPageOwner;
 
 
+/*************************************************
+                  ROUTES
+*************************************************/
 
-// getting all the pages
-router.get('/',(req,res)=>{
+
+//FETCHING ALL PAGES
+router.get('/', (req, res) => {
     Page.find({})
-    .limit(Number(req.query.count))
-    .then((pages)=>{
+      .limit(Number(req.query.count))
+      .then(pages => {
         res.status(200)
-            .json(pages);
-    })
-    .catch((err)=>{
-        console.log("Error occured!");
-        res.status(404)
-            .send();
-    })
-})
-
-// request for getting  the list of all the pages maintained by user.
-router.get('/my-pages',authenticate,(req,res) => {//user pages
-    Page.find({owner:req.user._id})
-    .limit(Number(req.query.count))
-    .sort({date:-1})
-    .then((userPages)=>{
-        res.status(200)            
-            .json(userpages);
-    })
-    .catch((err)=>{
+          .json(pages);
+      })
+      .catch(err => {
         console.log(err);
-        res.status(404)
-        .send();
-    })
-})
+        res.status(500)
+          .send();
+      });
+});
 
-// Request for getting the Page -- publicly available
-router.get('/:id',(req,res) => {
 
-    Post.find({
-        role: "page",
-        parent: req.params.id
-    })
-    .limit(req.query.count)
+//FETCHING PAGES CREATED AND FOLLOWED BY USER
+router.get('/my-pages', authenticate, (req, res) => {
+  let response = {};
+  Page.find({
+    owner: req.user._id
+  })
     .sort({date:-1})
-    .then((posts)=>{
-        res.status(200)
-            .json(posts);
+    .then(createdPages => {
+      console.log(createdPages);
+      response.createdPages = createdPages;
+      return Page.find({
+        $and: [
+          {_id: {$in: req.user.pages}},
+          {owner: {$ne: req.user._id}}
+        ]
+      })
+      .limit(Number(req.query.count))
+      .sort({date:-1});
     })
-    .catch((err)=>{
-        console.log(err);
-        res.status(404)
+    .then(followedPages => {
+      response.followedPages = followedPages;
+      res.status(200)
+        .json(response);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
         .send();
+    });
+});
+
+
+//FETCHING PAGE INFO
+router.get('/:id', authenticate, (req, res) => {
+  let response = {};
+  Page.findById(req.params.id)
+    .then(page => {
+      response = page._doc;
+      response.following = !(page.followers.indexOf(req.user._id) === -1);
+      response.liked = !(page.likes.indexOf(req.user._id) === -1);
+      res.status(200)
+        .json(response);
     })
-})
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
+
 
 //LIKING A PAGE
-router.get('/like/:id',authenticate, (req, res) => {
-    Page.findById(req.params.id)
-      .then(page => {
-          // if like a;ready exists
-        if (page.likes.indexOf(req.user._id) !== -1) {
-          Page.findByIdAndUpdate(req.params.id, {
-            $pull: {
-              likes: req.user._id
-            }
-          }).then(() => {
-            res.status(200)
-              .send();
-          }).catch(err => {
-            console.log(err);
-            res.status(500)
-              .json(err);
-          });
-        } else {
-          Page.findByIdAndUpdate(req.params.id, {
-            $push: {
-              likes: req.user._id
-            }
-          }).then(() => {
-            res.status(200)
-              .send();
-          }).catch(err => {
-            console.log(err);
-            res.status(500)
-              .json(err);
-          });
+router.put('/like/:id', authenticate, (req, res) => {
+  let query = {};
+  Page.findById(req.params.id)
+    .then(page => {
+      if (page.likes.indexOf(req.user._id) !== -1) {
+        query = {
+          $pull: {
+            likes: req.user._id
+          }
         }
-      });
-  });
+      } else {
+        query = {
+          $push: {
+            likes: req.user._id
+          }
+        }
+      }
+      return page.update(query);
+    })
+    .then(() => {
+      res.status(200)
+        .send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
 
-// post requests
 
-// making a new page
-router.post('/',authenticate,()=>{
-    var page = {
-        title: req.body.title,
-        description: req.body.content,
-        owner: req.user._id,
-        date: req.body.date
+//CREATING NEW PAGE
+router.post('/', authenticate, (req, res) => {
+    let savedPage = null;
+    if (!req.body.title || !req.body.description) {
+    res.status(400)
+      .send();
     }
-    new Page(page)
+
+    new Page({
+      ...req.body,
+      owner: req.user._id
+    })
     .save()
     .then(page => {
-        req.user.update({
-            $push: {
-                pages: page._id
-            }
-        })
-        res.status(200)
+      savedPage = page;
+      return page.update({
+        $push: {
+          followers: req.user._id
+        }
+      });
+    })
+    .then(() => {
+      return req.user.update({
+        $push: {
+          pages: savedPage._id
+        }
+      });
+    })
+    .then(() => {
+      res.status(200)
         .send();
     })
     .catch(err => {
       console.log(err);
       res.status(400)
         .json(err);
-    })
-})
+    });
+});
 
-//delete request
 
-//to remove a page with page id
-router.delete('/:id',authenticate,isOwner,(req,res)=>{
-    Page.findById(req.params.id)
-    .then((page) => {
-      return page.remove();
-    })
-    .then((page) => {
-      req.user.update({
-        $pull:{
+//DELETING A PAGE WITH PAGE ID
+router.delete('/:id', authenticate, isOwner, (req, res) => {
+  let pageToBeDeleted = null;
+  Page.findById(req.params.id)
+    .then(page => {
+      pageToBeDeleted = page;
+      return User.update({
+        _id: {
+          $in: page.followers
+        }
+      }, {
+        $pull: {
           pages: page._id
         }
-      })
+      }, {
+        multi: true
+      });
+    })
+    .then(() => {
+      return pageToBeDeleted.remove();
+    })
+    .then(() => {
       res.status(200)
         .send();
     })
@@ -149,72 +190,74 @@ router.delete('/:id',authenticate,isOwner,(req,res)=>{
 });
 
 
-// Update routes
-router.put('/:id',authenticate,isOwner,(req,res)=>{
-    let newPage = req.body;
-    Page.findByIdAndUpdate(req.params.id,newPage)
-    .then(()=>{
-        console.log('page details updated successfully');
+//UPDATING PAGE DETAILS
+router.put('/:id', authenticate, isOwner, (req, res) => {
+    Page.findByIdAndUpdate(req.params.id, req.body)
+      .then(() => {
         res.status(200)
-        .send();
-    })
-    .catch((err)=>{
-        console.log(err+" occured");
-        res.status(404)
-        .json(err);
-    })
-})
+          .send();
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500)
+          .send();
+      });
+});
 
-// adding or removing a new follower
-router.put('/:id/follow',authenticate,(req,res)=>{
+
+//FOLLOWING A PAGE
+router.put('/follow/:id', authenticate, (req, res) => {
+    let query = null;
+    let following = false;
+    let currentPage = null;
+
     Page.findById(req.params.id)
-    .then(page=>{
-        if(page.followers.indexOf(req.user._id)!=-1)// already a follower
-        {
-            page.update({
-                $pull: {
-                    followers: req.user._id
-                }
-            })
-            .then(()=>{
-                req.user.update({
-                    $pull:{
-                        pageFollowed: page._id
-                    }
-                })
-            })
-            .then(()=>{
-                res.status(200)
-                    .send();
-            })    
-            .catch((err)=>{
-                res.status(200)
-                    .send();
-            })
-        }
-        else{
-            page.update({
-                $push: {
-                    followers: req.user._id
-                }
-            })
-            .then(()=>{
-                req.user.update({
-                    $push:{
-                        pageFollowed: page._id
-                    }
-                })
-            })
-            .then(()=>{
-                res.status(200)
-                    .send();
-            })    
-            .catch((err)=>{
-                res.status(200)
-                    .send();
-            })
-        }        
-    })
-})
+      .then(page => {
+        currentPage = page;
+        following = !(req.user.pages.indexOf(page._id) === -1);
 
-module.exports = router; 
+        if (following) {
+          query = {
+            $pull: {
+              followers: req.user._id
+            }
+          }
+        } else {
+          query = {
+            $push: {
+              followers: req.user._id
+            }
+          }
+        }
+
+        return page.update(query);
+      })
+      .then((page) => {
+        if (following) {
+          query = {
+            $pull: {
+              pages: currentPage._id
+            }
+          }
+        } else {
+          query = {
+            $push: {
+              pages: currentPage._id
+            }
+          }
+        }
+
+        return req.user.update(query);
+      })
+      .then(() => {
+        res.status(200)
+          .send();
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500)
+          .send();
+      });
+});
+
+module.exports = router;
