@@ -66,6 +66,37 @@ router.get('/my-pages', authenticate, (req, res) => {
 });
 
 
+//FETCHING PAGE SUGGESTIONS FOR THE USER
+router.get('/suggestions', (req, res) => {
+  let suggestedPages = [];
+  User.find({
+    _id: {
+      $in: req.user.friends
+    }
+  })
+    .then(friends => {
+      friends.forEach(friend => {
+        suggestedPages = suggestedPages.concat(friend.pages);
+      });
+      return Page.find({
+        _id: {
+          $in: suggestedPages
+        }
+      })
+        .limit(Number(req.query.count));
+    })
+    .then(pages => {
+      res.status(200)
+        .json(pages);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
+
+
 //FETCHING PAGE INFO
 router.get('/:id', authenticate, (req, res) => {
   let response = {};
@@ -76,6 +107,35 @@ router.get('/:id', authenticate, (req, res) => {
       response.liked = !(page.likes.indexOf(req.user._id) === -1);
       res.status(200)
         .json(response);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
+
+
+//FETCHING PAGE FOLLOWERS
+router.get('/followers/:id', authenticate, (req, res) => {
+  Page.findById(req.params.id)
+    .then(page => {
+
+      if (!page) {
+        return res.status(400)
+          .send();
+      }
+
+      return User.find({
+        _id: {
+          $in: page.followers
+        }
+      })
+        .limit(Number(req.query.count));
+    })
+    .then(followers => {
+      res.status(200)
+        .json(followers);
     })
     .catch(err => {
       console.log(err);
