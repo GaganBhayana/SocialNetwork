@@ -27,7 +27,7 @@ router.post('/:id', authenticate, (req, res) => {
     owner: req.user._id,
     parent: req.params.id
   }).save()
-    .then((comment) => {
+    .then(comment => {
       return Post.findByIdAndUpdate(req.params.id, {
         $push: {
           comments: comment._id
@@ -58,7 +58,7 @@ router.post('/reply/:id', authenticate, (req, res) => {
     owner: req.user._id,
     parent: req.params.id
   }).save()
-    .then((comment) => {
+    .then(comment => {
       return Comment.findByIdAndUpdate(req.params.id, {
         $push: {
           comments: comment._id
@@ -85,7 +85,9 @@ router.get('/reply/:id', authenticate, (req, res) => {
         _id: {
           $in: comment.comments
         }
-      });
+      })
+        .sort({date: -1})
+        .limit(Number(req.query.count));
     })
     .then(subComments => {
       res.status(200)
@@ -100,36 +102,36 @@ router.get('/reply/:id', authenticate, (req, res) => {
 
 
 //LIKING A COMMENT
-router.get('/like/:id', authenticate, (req, res) => {
+router.put('/like/:id', authenticate, (req, res) => {
+  let query = {};
+
   Comment.findById(req.params.id)
     .then(comment => {
+
       if (comment.likes.indexOf(req.user._id) !== -1) {
-        Comment.findByIdAndUpdate(req.params.id, {
+        query = {
           $pull: {
             likes: req.user._id
           }
-        }).then(() => {
-          res.status(200)
-            .send();
-        }).catch(err => {
-          console.log(err);
-          res.status(500)
-            .json(err);
-        });
+        };
       } else {
-        Comment.findByIdAndUpdate(req.params.id, {
+        query = {
           $push: {
             likes: req.user._id
           }
-        }).then(() => {
-          res.status(200)
-            .send();
-        }).catch(err => {
-          console.log(err);
-          res.status(500)
-            .json(err);
-        });
+        };
       }
+
+      return comment.update(query);
+    })
+    .then(() => {
+      res.status(200)
+        .send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
     });
 });
 
@@ -138,8 +140,8 @@ router.get('/like/:id', authenticate, (req, res) => {
 router.delete('/:id', authenticate, isOwner, (req, res) => {
   let commentToBeRemoved = {};
   Comment.findById(req.params.id)
-    .then((comment) => {
-      commentToBeRemoved = {...comment};
+    .then(comment => {
+      commentToBeRemoved = {...comment._doc};
       return comment.remove();
     })
     .then(() => {
@@ -167,9 +169,7 @@ router.put('/:id', authenticate, isOwner, (req, res) => {
     res.status(400)
       .send();
   }
-  Comment.findByIdAndUpdate(req.params.id, {
-    content: req.body.content
-  })
+  Comment.findByIdAndUpdate(req.params.id, req.body)
     .then(() => {
       res.status(200)
         .send();
@@ -177,7 +177,7 @@ router.put('/:id', authenticate, isOwner, (req, res) => {
     .catch(err => {
       console.log(err);
       res.status(500)
-        .json(err);
+        .send();
     });
 });
 
