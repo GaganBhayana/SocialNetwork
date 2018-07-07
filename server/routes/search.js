@@ -14,7 +14,7 @@ const Page = require('../models/user');
                     ROUTES
 ************************************************/
 
-router.get('/:query', (req, res) => {
+router.get('/:query', authenticate, (req, res) => {
   let response = {};
   let query = new RegExp(req.params.query, 'i');
   let count = Number(req.query.count);
