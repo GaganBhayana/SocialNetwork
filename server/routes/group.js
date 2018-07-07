@@ -65,6 +65,37 @@ router.get('/my-groups', authenticate, (req, res) => {
 });
 
 
+//FETCHING GROUP SUGGESTIONS FOR THE USER
+router.get('/suggestions', (req, res) => {
+  let suggestedGroups = [];
+  User.find({
+    _id: {
+      $in: req.user.friends
+    }
+  })
+    .then(friends => {
+      friends.forEach(friend => {
+        suggestedGroups = suggestedGroups.concat(friend.groups);
+      });
+      return Group.find({
+        _id: {
+          $in: suggestedGroups
+        }
+      })
+        .limit(Number(req.query.count));
+    })
+    .then(groups => {
+      res.status(200)
+        .json(groups);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
+    });
+});
+
+
 //FETCHING DETAILS OF A GROUP
 router.get('/:id', authenticate, (req,res) => {
   let response = {};
