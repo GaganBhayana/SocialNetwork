@@ -2,6 +2,8 @@
 const Comment = require('../models/comment');
 const Post = require('../models/post');
 const User = require('../models/user');
+const Group = require('../models/group');
+const Page = require('../models/page');
 
 
 //LOADING DEPENDENCIES
@@ -24,7 +26,7 @@ router.use('/comment', comment);
                       ROUTES
 **********************************************************/
 
-//FETCHING ALL POSTS FOR A USER
+//FETCHING ALL POSTS FOR A USER, PAGE, OR GROUP
 router.get('/', authenticate, (req, res) => {
   let friends = req.user.friends;
   friends.push(req.user._id);
@@ -34,6 +36,13 @@ router.get('/', authenticate, (req, res) => {
   if (req.query.parent) {
     query = {
       parent: req.query.parent
+    }
+  } else if(req.query.id) {
+    query = {
+      $and: [
+        {owner: req.query.id},
+        {role: 'normal'}
+      ]
     }
   } else {
     query = {
@@ -62,7 +71,7 @@ router.get('/', authenticate, (req, res) => {
     .catch(err => {
       console.log(err);
       res.status(500)
-        .json(err);
+        .send();
     });
 });
 
@@ -71,9 +80,10 @@ router.get('/', authenticate, (req, res) => {
 router.get('/my-posts', authenticate, (req, res) => {
   Post.find({
     owner: req.user._id
-  }).sort({
-    date: -1
   })
+    .sort({
+      date: -1
+    })
     .limit(Number(req.query.count))
     .then(posts => {
       res.status(200)
@@ -82,7 +92,7 @@ router.get('/my-posts', authenticate, (req, res) => {
     .catch(err => {
       console.log(err);
       res.status(500)
-        .json(err);
+        .send();
     });
 });
 
@@ -93,15 +103,32 @@ router.get('/:id', authenticate, (req, res) => {
 
   Post.findById(req.params.id)
     .then(fetchedPost => {
-      post = fetchedPost;
+
+      if (!fetchedPost) {
+        return res.status(400)
+          .send();
+      }
+
+      post = {...fetchedPost._doc};
+      post.liked = !(post.likes.indexOf(req.user._id) === -1);
       return Comment.find({
         _id: {
           $in: fetchedPost.comments
         }
-      });
+      })
+        .sort({date: -1})
+        .limit(Number(req.query.count));
     })
     .then(comments => {
       post.comments = comments;
+      return User.findById(post.owner);
+    })
+    .then(owner => {
+      post.owner = {
+        name: owner.name,
+        _id: owner._id,
+        img: owner.img,
+      };
       res.status(200)
         .json(post);
     })
@@ -114,36 +141,36 @@ router.get('/:id', authenticate, (req, res) => {
 
 
 //LIKING A POST
-router.get('/like/:id', authenticate, (req, res) => {
+router.put('/like/:id', authenticate, (req, res) => {
+  let query = {};
+
   Post.findById(req.params.id)
     .then(post => {
+
       if (post.likes.indexOf(req.user._id) !== -1) {
-        Post.findByIdAndUpdate(req.params.id, {
+        query = {
           $pull: {
             likes: req.user._id
           }
-        }).then(() => {
-          res.status(200)
-            .send();
-        }).catch(err => {
-          console.log(err);
-          res.status(500)
-            .json(err);
-        });
+        };
       } else {
-        Post.findByIdAndUpdate(req.params.id, {
+        query = {
           $push: {
             likes: req.user._id
           }
-        }).then(() => {
-          res.status(200)
-            .send();
-        }).catch(err => {
-          console.log(err);
-          res.status(500)
-            .json(err);
-        });
+        };
       }
+
+      return post.update(query);
+    })
+    .then(() => {
+      res.status(200)
+        .send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
     });
 });
 
@@ -167,27 +194,27 @@ router.post('/', authenticate, (req, res) => {
 
   new Post(post)
     .save()
-    .then((post) => {
+    .then(post => {
       savedPost = post;
-      return User.findByIdAndUpdate(req.user._id, {
+      return req.user.update({
         $push: {
           posts: post._id
         }
       });
     })
     .then(() => {
-      if (role === 'group') {
-        Group.findByIdAndUpdate(req.query.parent, {
-          $push: {
-            posts: savedPost._id
-          }
-        });
+      let query = {
+        $push: {
+          posts: savedPost._id
+        }
+      };
+
+      if (savedPost.role === 'group') {
+        return Group.findByIdAndUpdate(req.query.parent, query);
+      } else if(savedPost.role === 'page'){
+        return Page.findByIdAndUpdate(req.query.parent, query);
       } else {
-        Page.findByIdAndUpdate(req.query.parent, {
-          $push: {
-            posts: savedPost._id
-          }
-        });
+        return;
       }
     })
     .then(() => {
@@ -196,39 +223,25 @@ router.post('/', authenticate, (req, res) => {
     })
     .catch(err => {
       console.log(err);
-      res.status(400)
-        .json(err);
-    })
+      res.status(500)
+        .send();
+    });
 });
 
 
 //DELETING A POST
 router.delete('/:id', authenticate, isOwner, (req, res) => {
   Post.findById(req.params.id)
-    .then((post) => {
+    .then(post => {
       return post.remove();
     })
-    .then((post) => {
-      req.user.update({
+    .then(post => {
+      return req.user.update({
         $pull:{
           posts: post._id
         }
-      })
-      res.status(200)
-        .send();
+      });
     })
-    .catch((err) => {
-      console.log(err);
-      res.status(500)
-        .json(err);
-    });
-});
-
-
-//UPDATING A POST
-router.put('/:id', authenticate, isOwner, (req, res) => {
-  let post = req.body;
-  Post.findByIdAndUpdate(req.params.id, post)
     .then(() => {
       res.status(200)
         .send();
@@ -236,7 +249,22 @@ router.put('/:id', authenticate, isOwner, (req, res) => {
     .catch(err => {
       console.log(err);
       res.status(500)
-        .json(err);
+        .send();
+    });
+});
+
+
+//UPDATING A POST
+router.put('/:id', authenticate, isOwner, (req, res) => {
+  Post.findByIdAndUpdate(req.params.id, req.body)
+    .then(() => {
+      res.status(200)
+        .send();
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500)
+        .send();
     });
 });
 
