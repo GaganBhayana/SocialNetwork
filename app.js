@@ -147,7 +147,7 @@ app.post('/api/login', (req, res) => {
 });
 
 
-SENDING POST BUILD
+//SENDING POST BUILD
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
