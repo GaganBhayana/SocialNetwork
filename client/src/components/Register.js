@@ -1,18 +1,23 @@
 import React, { Component } from 'react';
 
 import AuthService from '../utils/authService';
-import LoginForm from './forms/authentication/AuthenticationForm';
+import SignupForm from './forms/authentication/AuthenticationForm';
 
 class Login extends Component {
     constructor(){
         super();
         this.handleChange = this.handleChange.bind(this);
-        this.handleFormSubmit = this.handleFormSubmit.bind(this);
         this.Auth = new AuthService();
         this.state = {
+          name: '',
           email: '',
           password: '',
           fields: {
+            name: {
+              type: 'text',
+              name: 'name',
+              placeholder: 'Your name',
+            },
             email: {
               type: 'email',
               name: 'email',
@@ -30,21 +35,43 @@ class Login extends Component {
         };
     }
 
-    handleChange = (event) => {
-      this.setState({
-        [event.target.name]: event.target.value
-      });
-    }
-
     componentWillMount() {
       if (this.Auth.loggedIn()) {
         this.props.history.replace('/');
       }
     }
 
-    handleFormSubmit = (event) => {
-      event.preventDefault();
-      this.Auth.login(this.state.email, this.state.password)
+    handleChange = (event) => {
+      this.setState({
+        [event.target.name]: event.target.value
+      });
+    }
+
+    componentDidUpdate() {
+      console.log(this.state.name);
+    }
+
+    render() {
+      return (
+        <SignupForm
+          title='Sign up'
+          fields={this.state.fields}
+          buttonText='Register'
+          footerText1='Already Registered?'
+          footerText2='Log In'
+          footerLink='/login'
+          changed={this.handleChange}
+          values={{
+            name: this.state.name,
+            email: this.state.email,
+            password: this.state.password
+          }} />
+      );
+    }
+
+    handleFormSubmit = (e) => {
+      e.preventDefault();
+      this.Auth.login(this.state.username, this.state.password)
         .then((res) => {
           if (res.data.token) {
             this.Auth.setToken(res.data.token);
@@ -57,24 +84,6 @@ class Login extends Component {
           console.log(err);
           alert(err);
         });
-    }
-
-    render() {
-      return (
-        <LoginForm
-          title='Log in'
-          fields={this.state.fields}
-          buttonText='Log in'
-          footerText1='Not registered yet?'
-          footerText2='Sign Up'
-          footerLink='/register'
-          changed={this.handleChange}
-          submit={this.handleFormSubmit}
-          values={{
-            email: this.state.email,
-            password: this.state.password
-          }}/>
-      );
     }
 }
 
