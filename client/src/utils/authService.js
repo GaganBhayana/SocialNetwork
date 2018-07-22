@@ -9,6 +9,14 @@ export default class AuthService {
     localStorage.setItem('auth_token', token);
   }
 
+  register = (name, email, password) => {
+    return axios.post('/sign-up', {
+      name,
+      email,
+      password
+    });
+  }
+
   login = (email, password) => {
     return axios.post('/login', {
       email,
