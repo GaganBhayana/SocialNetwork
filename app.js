@@ -112,7 +112,7 @@ app.post('/api/login', (req, res) => {
     email: req.body.email
   }).then((user) => {
     if (!user) {
-      res.status(400)
+      res.status(200)
         .json({
           success: false,
           message: 'User not found'
@@ -120,7 +120,7 @@ app.post('/api/login', (req, res) => {
     } else if (user) {
       bcrypt.compare(req.body.password, user.password, (err, result) => {
         if (!result) {
-          res.status(400)
+          res.status(200)
             .json({
               success: false,
               message: "Email and Password doesn't match"
