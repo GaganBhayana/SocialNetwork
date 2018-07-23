@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import {Switch, Route} from 'react-router';
 
-import Home from './containers/Home';
-import Login from './containers/Login';
-import Register from './containers/Register';
-import NotFound from './containers/NotFound';
+import {
+  Home,
+  Login,
+  Register,
+  NotFound,
+  UserProfile
+} from './containers/Containers';
+
 import Layout from './hoc/layout/Layout';
 
 class App extends Component {
@@ -14,6 +18,7 @@ class App extends Component {
         <Switch>
           <Route exact path='/login' component={Login} />
           <Route exact path='/register' component={Register} />
+          <Route exact path='/me' component={UserProfile} />
           <Route exact path='/' component={Home} />
           <Route path='' component={NotFound} />
         </Switch>

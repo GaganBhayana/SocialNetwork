@@ -1,7 +1,11 @@
 import React, {Component} from 'react';
+
 import AuthService from '../utils/authService';
-import WithAuth from '../hoc/WithAuth';
-import Aux from '../hoc/Aux';
+
+import {
+  WithAuth,
+  Aux
+} from '../hoc/Hoc';
 
 class Home extends Component {
   constructor() {

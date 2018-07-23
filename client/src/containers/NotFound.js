@@ -1,13 +1,15 @@
 import React from 'react';
 
+//BACKGROUND IMAGE FOR 404 ERROR
 import Background from '../assets/img/404.png';
 
 const NotFound = (props) => {
   const imgContainer = {
     display: 'flex',
     margin: 'auto',
-    height: '100vh',
-    alignItems: 'center'
+    height: '90vh',
+    alignItems: 'center',
+    justifyContent: 'center'
   };
 
   return (

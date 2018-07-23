@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {withRouter} from 'react-router-dom';
-
 import axios from '../../utils/axios';
+
 import AuthService from '../../utils/authService';
 import WithAuth from '../../hoc/WithAuth';
 import Sidebar from './sidebar/Sidebar';

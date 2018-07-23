@@ -11,10 +11,13 @@
   width: 100%;
   box-shadow: 0px 4px 5px 0px #ccc;
   justify-content: space-between;
+  align-items: center;
   padding: 0 16px;
+  z-index: 10;
 }
 
 .Left {
+  flex-grow: 2;
   display: inline-flex;
   height: 100%;
   padding: 0 12px;
@@ -23,11 +26,11 @@
 }
 
 .Right {
+  flex-grow: 1;
   display: inline-flex;
-  height: 100%;
-  padding: 0;
-  margin: 0 16px;
+  height: 60%;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .Logo {
@@ -44,6 +47,7 @@
   align-self: center;
   margin-left: 80px;
   flex-grow: 5;
+  max-width: 350px;
   width: 80%;
 }
 
@@ -51,9 +55,8 @@
   align-self: center;
   font-size: 48px;
   color: #424242;
-  margin-left: 16px;
-  margin-right: 16px;
-  margin-bottom: 5px;
+  align-content: center;
+  margin: 0 16px;
   cursor: pointer;
 }
 
@@ -70,10 +73,6 @@
 @media (max-width: 600px) {
   .SearchBar, .Icon{
     display: none;
-  }
-
-  .Logo {
-    font-size: 24px;
   }
 
   .DrawerIcon {

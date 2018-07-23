@@ -1,45 +1,53 @@
 import React, { Component } from 'react';
-
-import AuthService from '../utils/authService';
-import SignupForm from '../components/forms/authentication/AuthenticationForm';
-import Aux from '../hoc/Aux';
-import Notifications from '../components/notifications/Notifications';
 import * as emailValidator from 'email-validator';
 
+import AuthService from '../utils/authService';
+
+import {
+  Notifications,
+  AuthenticationForm as SignupForm
+} from '../components/Components';
+
+import {
+  Aux
+} from '../hoc/Hoc';
+
+
 class Login extends Component {
-    constructor(){
-        super();
-        this.handleChange = this.handleChange.bind(this);
-        this.handleFormSubmit = this.handleFormSubmit.bind(this);
-        this.collapseNotification = this.collapseNotification.bind(this);
-        this.Auth = new AuthService();
-        this.state = {
-          name: '',
-          email: '',
-          password: '',
-          fields: {
-            name: {
-              type: 'text',
-              name: 'name',
-              placeholder: 'Your name',
-            },
-            email: {
-              type: 'email',
-              name: 'email',
-              placeholder: 'Your email'
-            },
-            password: {
-              type: 'password',
-              name: 'password',
-              placeholder: 'Your password',
-              validation: {
-                minLength: 8
-              }
-            }
-          },
-          alerts: []
-        };
-    }
+  constructor(){
+    super();
+    this.handleChange = this.handleChange.bind(this);
+    this.handleFormSubmit = this.handleFormSubmit.bind(this);
+    this.collapseNotification = this.collapseNotification.bind(this);
+    this.Auth = new AuthService();
+
+    this.state = {
+      name: '',
+      email: '',
+      password: '',
+      fields: {
+        name: {
+          type: 'text',
+          name: 'name',
+          placeholder: 'Your name',
+        },
+        email: {
+          type: 'email',
+          name: 'email',
+          placeholder: 'Your email'
+        },
+        password: {
+          type: 'password',
+          name: 'password',
+          placeholder: 'Your password',
+          validation: {
+            minLength: 8
+          }
+        }
+      },
+      alerts: []
+    };
+  }
 
     componentWillMount() {
       if (this.Auth.loggedIn()) {

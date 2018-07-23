@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
 import Particles from 'react-particles-js';
 
-import Aux from '../Aux';
+//BACKGROUND IMAGE FOR UNAUTHENTICATED ROUTES
 import Background from '../../assets/img/unAuthenticated.jpg';
+
+import classes from './Layout.css';
+
+import Aux from '../Aux';
 import AuthService from '../../utils/authService';
 import Navigation from '../../components/navigation/Navigation';
-import classes from './Layout.css';
 
 const params = {
   particles: {

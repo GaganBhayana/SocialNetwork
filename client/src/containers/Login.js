@@ -1,9 +1,15 @@
 import React, { Component } from 'react';
 
 import AuthService from '../utils/authService';
-import LoginForm from '../components/forms/authentication/AuthenticationForm';
-import Notifications from '../components/notifications/Notifications';
-import Aux from '../hoc/Aux';
+
+import {
+  Notifications,
+  AuthenticationForm as LoginForm
+} from '../components/Components';
+
+import {
+  Aux
+} from '../hoc/Hoc';
 
 class Login extends Component {
     constructor(){
