@@ -15,7 +15,9 @@ const WithAuth = (ChildComponent) => {
     }
 
     render() {
-      return <ChildComponent history={this.props.history}/>;
+      return <ChildComponent
+        {...this.props}
+        />;
     }
   };
 }

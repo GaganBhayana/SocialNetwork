@@ -1,5 +1,4 @@
 import React from 'react';
-import {Col} from 'mdbreact';
 
 import Background from '../assets/img/404.png';
 

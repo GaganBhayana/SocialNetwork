@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 
 import AuthService from '../utils/authService';
-import LoginForm from './forms/authentication/AuthenticationForm';
-import Notifications from './notifications/Notifications';
+import LoginForm from '../components/forms/authentication/AuthenticationForm';
+import Notifications from '../components/notifications/Notifications';
 import Aux from '../hoc/Aux';
 
 class Login extends Component {
@@ -98,7 +98,7 @@ class Login extends Component {
           items={this.state.errors}
           collapse={this.collapseNotification}/> : null
       );
-      
+
       return (
         <Aux>
           <LoginForm

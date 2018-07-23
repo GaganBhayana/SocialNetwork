@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 
 import AuthService from '../utils/authService';
-import SignupForm from './forms/authentication/AuthenticationForm';
+import SignupForm from '../components/forms/authentication/AuthenticationForm';
 import Aux from '../hoc/Aux';
-import Notifications from './notifications/Notifications';
+import Notifications from '../components/notifications/Notifications';
 import * as emailValidator from 'email-validator';
 
 class Login extends Component {

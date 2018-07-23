@@ -1,28 +1,23 @@
 import React, { Component } from 'react';
 import {Switch, Route} from 'react-router';
 
-import Home from './components/Home';
-import Login from './components/Login';
-import Register from './components/Register';
-import NotFound from './components/NotFound';
-import UnAuthenticated from './hoc/layout/UnAuthenticated';
-import Aux from './hoc/Aux';
+import Home from './containers/Home';
+import Login from './containers/Login';
+import Register from './containers/Register';
+import NotFound from './containers/NotFound';
+import Layout from './hoc/layout/Layout';
 
 class App extends Component {
   render() {
     return (
-      <Aux>
-        <UnAuthenticated>
-          <Switch>
-            <Route path='/login' component={Login} />
-            <Route path='/register' component={Register} />
-            <Route path='' component={NotFound} />
-          </Switch>
-        </UnAuthenticated>
+      <Layout>
         <Switch>
+          <Route exact path='/login' component={Login} />
+          <Route exact path='/register' component={Register} />
           <Route exact path='/' component={Home} />
+          <Route path='' component={NotFound} />
         </Switch>
-      </Aux>
+      </Layout>
     );
   }
 }
