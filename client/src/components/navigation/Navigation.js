@@ -1,9 +1,13 @@
-import React, {Component} from 'react';
-import {withRouter} from 'react-router-dom';
-import axios from '../../utils/axios';
+import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+
+import fetchCurrentUser from '../../redux/actions/userActions';
+
+//AVATAR IMAGE
+import Avatar from '../../assets/img/avatar.jpg';
 
 import AuthService from '../../utils/authService';
-import WithAuth from '../../hoc/WithAuth';
 import Sidebar from './sidebar/Sidebar';
 import Navbar from './navbar/Navbar';
 import Aux from '../../hoc/Aux';
@@ -16,22 +20,11 @@ class Navigation extends Component {
     this.state = {
       drawerOpen: false,
       searchQuery: '',
-      img: '',
     }
   }
 
   componentDidMount() {
-    axios.get('/user/', {
-      headers: {'x-access-token': this.Auth.getToken()}
-    })
-      .then(res => {
-        this.setState({
-          img: res.data.img
-        });
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    this.props.dispatch(fetchCurrentUser());
   }
 
   handleSearch = (event) => {
@@ -65,10 +58,16 @@ class Navigation extends Component {
           changed={this.handleSearch}
           logout={this.handleLogout}
           searchQuery={this.searchQuery}
-          img={this.state.img}/>
+          img={this.props.user.img || Avatar}/>
       </Aux>
     );
   }
 }
 
-export default withRouter(WithAuth(Navigation));
+const mapStateToProps = (state) => ({
+  user: state.currentUser.user,
+  loading: state.currentUser.loading,
+  error: state.currentUser.error
+});
+
+export default connect(mapStateToProps)(withRouter(Navigation));

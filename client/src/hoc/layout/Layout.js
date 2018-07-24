@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import Particles from 'react-particles-js';
 
 //BACKGROUND IMAGE FOR UNAUTHENTICATED ROUTES
@@ -9,6 +9,8 @@ import classes from './Layout.css';
 import Aux from '../Aux';
 import AuthService from '../../utils/authService';
 import Navigation from '../../components/navigation/Navigation';
+
+const Auth = new AuthService();
 
 const params = {
   particles: {
@@ -26,35 +28,27 @@ const params = {
 };
 
 
-export default class Layout extends Component {
+export default function(props) {
+  let layout = (
+    <Aux>
+      <Navigation/>
+      <div className={classes.Main}>
+        {props.children}
+      </div>
+    </Aux>
+  );
 
-  constructor(props) {
-    super(props);
-    this.Auth = new AuthService();
-  }
-
-  render() {
-    let layout = (
+  if(!Auth.loggedIn()) {
+    layout = (
       <Aux>
-        <Navigation/>
-        <div className={classes.Main}>
-          {this.props.children}
-        </div>
+        <Particles
+          className={classes.Particles}
+          style={{backgroundImage: `url(${Background})`}}
+          params={params}/>
+        {props.children}
       </Aux>
     );
-
-    if(!this.Auth.loggedIn()) {
-      layout = (
-        <Aux>
-          <Particles
-            className={classes.Particles}
-            style={{backgroundImage: `url(${Background})`}}
-            params={params}/>
-          {this.props.children}
-        </Aux>
-      );
-    }
-
-    return layout;
   }
+
+  return layout;
 };
