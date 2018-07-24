@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 
 import AuthService from '../../../utils/authService';
-import stateToProps from '../../../utils/stateToProps/currentUser';
 import axios from '../../../utils/axios';
 import { Aux } from '../../../hoc/Hoc';
 import { Notifications } from '../../Components';
@@ -54,7 +53,7 @@ class CreatePost extends Component {
       data: {
         content: this.state.content,
         img: this.state.img,
-        owner: this.props.user._id
+        owner: this.props.userId
       },
       headers: {
         'x-access-token': this.Auth.getToken()
@@ -152,4 +151,8 @@ class CreatePost extends Component {
   }
 }
 
-export default connect(stateToProps)(withRouter(CreatePost));
+const mapStateToProps = (state) => ({
+  userId: state.currentUser.user._id
+});
+
+export default connect(mapStateToProps)(withRouter(CreatePost));

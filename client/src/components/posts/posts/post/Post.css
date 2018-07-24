@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css?family=Amatic+SC');
+
+.Post {
+  margin: 12px 0;
+  box-shadow: 2px 2px 2px 2px #ccc;
+  background: white
+}
+
+.ImgContainer {
+  margin: 0;
+  padding: 0;
+  max-height: 500px;
+  overflow: hidden;
+}
+
+.Img {
+  width: 100%;
+  height: auto;
+}
+
+.Content {
+  margin: 0;
+  padding: 16px;
+  min-height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  font-family: 'Amatic SC', cursive;
+  font-weight: 500;
+}

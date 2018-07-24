@@ -1,12 +1,20 @@
 import React from 'react';
 
 import {
-  WithAuth
+  WithAuth,
+  Aux
 } from '../hoc/Hoc';
+
+import {
+  Posts
+} from '../components/Components';
 
 const UserProfile = () => {
   return (
-    <h1>User Profile</h1>
+    <Aux>
+      <h1>User Profile</h1>
+      <Posts />
+    </Aux>
   );
 }
 

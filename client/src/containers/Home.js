@@ -3,7 +3,8 @@ import React, {Component} from 'react';
 import AuthService from '../utils/authService';
 
 import {
-  CreatePost
+  CreatePost,
+  Posts
 } from '../components/Components';
 
 import {
@@ -21,6 +22,7 @@ class Home extends Component {
     return (
       <Aux>
         <CreatePost />
+        <Posts />
       </Aux>
     );
   }

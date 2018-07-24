@@ -3,7 +3,6 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import fetchCurrentUser from '../../redux/actions/userActions';
-import stateToProps from '../../utils/stateToProps/currentUser';
 
 //AVATAR IMAGE
 import Avatar from '../../assets/img/avatar.jpg';
@@ -65,4 +64,10 @@ class Navigation extends Component {
   }
 }
 
-export default connect(stateToProps)(withRouter(Navigation));
+const mapStateToProps = (state) => ({
+  user: state.currentUser.user,
+  error: state.currentUser.error,
+  loading: state.currentUser.loading
+});
+
+export default connect(mapStateToProps)(withRouter(Navigation));
