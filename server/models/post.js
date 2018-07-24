@@ -32,6 +32,12 @@ var postSchema = new Schema({
 		ref: 'user',
 		required: true
 	},
+	ownerName: {
+		type: String
+	},
+	ownerImg: {
+		type: String
+	},
 	date: {
 		type: Date,
 		default: new Date()

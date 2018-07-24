@@ -174,6 +174,7 @@ router.put('/friend-request/accept/:id', authenticate, (req, res) => {
 router.put('/', authenticate, (req, res) => {
   delete req.body.email;
   delete req.body.password;
+  delete req.body.name;
 
   User.findByIdAndUpdate(req.user._id, req.body)
     .then(() => {

@@ -184,6 +184,8 @@ router.post('/', authenticate, (req, res) => {
   post.owner = req.user._id;
   post.role = req.query.role || 'normal';
   post.parent = req.query.parent;
+  post.ownerName = req.user.name;
+  post.ownerImg = req.user.img;
 
   let savedPost = null;
 
