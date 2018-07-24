@@ -19,6 +19,10 @@ var groupSchema = new Schema({
 		type: mongoose.Schema.ObjectId,
 		ref: 'post'
 	}],
+	img: {
+		type: String,
+		required: true
+	},
 	owner : {
 		type: mongoose.Schema.ObjectId,
 		ref: 'user'

@@ -145,6 +145,7 @@ router.post('/', authenticate, (req, res) => {
     new Group({
       title: req.body.title,
       description: req.body.description,
+      img: req.body.img,
       owner: req.user._id,
     })
       .save()

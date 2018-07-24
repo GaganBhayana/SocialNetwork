@@ -20,6 +20,10 @@ var pageSchema = new Schema({
 		ref: 'user',
 		required: true
 	},
+	img: {
+		type: String,
+		required: true
+	},
 	likes: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'user'
