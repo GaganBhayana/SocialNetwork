@@ -8,10 +8,11 @@
 }
 
 .NotificationContainer {
-  position: absolute;
+  position: fixed;
   display: block;
   left: 32px;
   bottom: 32px;
+  z-index: 80;
 }
 
 .Danger {

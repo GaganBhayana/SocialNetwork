@@ -177,11 +177,6 @@ router.put('/like/:id', authenticate, (req, res) => {
 
 //POSTING A POST
 router.post('/', authenticate, (req, res) => {
-  if (!req.body.title) {
-    res.status(400)
-      .send();
-  }
-
   let post = {};
   post.title = req.body.title;
   post.content = req.body.content;

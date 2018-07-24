@@ -10,11 +10,13 @@
   position: absolute;
   top: 60px;
   left: 255px;
+  right: 0;
 }
 
 @media (max-width: 600px) {
   .Main {
     left: 0;
     top: 60px;
+    width: 100%;
   }
 }
