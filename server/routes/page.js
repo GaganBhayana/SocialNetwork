@@ -67,7 +67,7 @@ router.get('/my-pages', authenticate, (req, res) => {
 
 
 //FETCHING PAGE SUGGESTIONS FOR THE USER
-router.get('/suggestions', (req, res) => {
+router.get('/suggestions', authenticate, (req, res) => {
   let suggestedPages = [];
   User.find({
     _id: {

@@ -9,7 +9,7 @@
   flex-direction: column;
   box-shadow: 4px 4px 5px 0px #ccc;
   z-index: 50;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 ::-webkit-scrollbar {

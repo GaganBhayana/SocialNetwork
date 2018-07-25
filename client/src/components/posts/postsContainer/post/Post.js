@@ -1,6 +1,12 @@
 import React from 'react';
+import ReactTooltip from 'react-tooltip';
+import { Link } from 'react-router-dom';
 
 import classes from './Post.css';
+import Menu from './menu/Menu';
+
+//IMG FOR USERS WHO DONT HAVE A PIC
+import Avatar from '../../../../assets/img/avatar.jpg';
 
 const backgrounds = [
   {
@@ -35,11 +41,11 @@ const backgrounds = [
     backgroundImage: 'linear-gradient(to top, #3b41c5 0%, #a981bb 49%, #ffc8a9 100%)',
     color: 'white'
   }
-]
+];
 
 
-
-const Post = ({post}) => {
+const Post = (props) => {
+  const post = props.post;
 
   let backgroundStyle = {};
 
@@ -50,6 +56,30 @@ const Post = ({post}) => {
 
   return (
     <div className={classes.Post}>
+      <div className={classes.Owner}>
+        <img
+          className={classes.OwnerImg}
+          alt='img'
+          src={post.ownerImg ? post.ownerImg : Avatar}/>
+        <Link to={props.userId === post.owner ? '/me' : `/user/${post.owner}/${post.ownerName.split(' ').join('-')}`}>
+          <h1
+            data-tip
+            onMouseEnter={props.handleMouseEnter}
+            onMouseLeave={props.handleMouseLeave}
+            className={classes.OwnerName}>{post.ownerName}</h1>
+        </Link>
+        <ReactTooltip
+          place="right"
+          type='light'
+          className={classes.Info}>
+          {props.Info}
+        </ReactTooltip>
+        {props.showMenu ?
+          <Menu
+            edit={props.toggleEditModal}
+            delete={props.toggleDeleteModal}/> :
+          null}
+      </div>
       <div className={classes.ImgContainer}>
         {post.img ?
           <img

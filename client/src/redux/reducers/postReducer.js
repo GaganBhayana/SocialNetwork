@@ -1,7 +1,8 @@
 import {
   FETCH_POSTS_BEGIN,
   FETCH_POSTS_SUCCESS,
-  FETCH_POSTS_FAILURE
+  FETCH_POSTS_FAILURE,
+  DELETE_POST,
 } from '../actions/postActions';
 
 const initialState = {
@@ -31,6 +32,13 @@ export default function(state = initialState, action) {
         ...state,
         loading: false,
         error: action.payload.error
+      }
+    }
+
+    case DELETE_POST: {
+      return {
+        ...state,
+        posts: state.posts.slice(0, action.payload.index).concat(state.posts.slice(action.payload.index+1))
       }
     }
 

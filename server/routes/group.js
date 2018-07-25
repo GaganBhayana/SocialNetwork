@@ -66,7 +66,7 @@ router.get('/my-groups', authenticate, (req, res) => {
 
 
 //FETCHING GROUP SUGGESTIONS FOR THE USER
-router.get('/suggestions', (req, res) => {
+router.get('/suggestions', authenticate, (req, res) => {
   let suggestedGroups = [];
   User.find({
     _id: {

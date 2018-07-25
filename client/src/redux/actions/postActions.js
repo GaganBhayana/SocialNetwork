@@ -6,6 +6,7 @@ const Auth = new AuthService();
 export const FETCH_POSTS_BEGIN = 'FETCH_POSTS_BEGIN';
 export const FETCH_POSTS_SUCCESS = 'FETCH_POSTS_SUCCESS';
 export const FETCH_POSTS_FAILURE = 'FETCH_POSTS_FAILURE';
+export const DELETE_POST = 'DELETE_POST';
 
 export const fetchPostBegin = () => {
   return {
@@ -24,6 +25,22 @@ export const fetchPostFailure = (error) => {
   return {
     type: FETCH_POSTS_FAILURE,
     payload: {error}
+  };
+}
+
+export const deletePost = (index, id) => {
+  axios({
+    method: 'delete',
+    url: '/post/'+id,
+    headers: {
+      'x-access-token': Auth.getToken()
+    }
+  })
+    .then(res => null)
+    .catch(err => console.log(err))
+  return {
+    type: DELETE_POST,
+    payload: {index}
   };
 }
 

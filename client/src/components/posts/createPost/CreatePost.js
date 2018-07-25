@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
+import { Button } from 'mdbreact';
 
 import AuthService from '../../../utils/authService';
 import axios from '../../../utils/axios';
 import { Aux } from '../../../hoc/Hoc';
 import { Notifications } from '../../Components';
+
+import fetchPosts from '../../../redux/actions/postActions';
 
 import classes from './CreatePost.css';
 
@@ -71,6 +74,8 @@ class CreatePost extends Component {
           loading: false,
           alerts: alerts
         });
+
+        this.props.dispatch(fetchPosts({}));
       })
       .catch(err => {
         console.log(err);
@@ -140,11 +145,11 @@ class CreatePost extends Component {
               width='auto'
               alt='img'/>
           </div>
-          <button
+          <Button
             className={classes.PostButton}
             onClick={this.handleSubmit}>
             Post
-          </button>
+          </Button>
         </div>
       </Aux>
     );

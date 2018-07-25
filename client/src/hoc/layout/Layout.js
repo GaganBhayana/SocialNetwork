@@ -8,7 +8,11 @@ import classes from './Layout.css';
 
 import Aux from '../Aux';
 import AuthService from '../../utils/authService';
-import Navigation from '../../components/navigation/Navigation';
+
+import {
+  Navigation,
+  SuggestionBar  
+} from '../../components/Components';
 
 const Auth = new AuthService();
 
@@ -32,8 +36,13 @@ export default function(props) {
   let layout = (
     <Aux>
       <Navigation/>
-      <div className={classes.Main}>
-        {props.children}
+      <div className={classes.Container}>
+        <div className={classes.Right}>
+          <SuggestionBar />
+        </div>
+        <div className={classes.Main}>
+          {props.children}
+        </div>
       </div>
     </Aux>
   );
