@@ -6,13 +6,20 @@ import {
 } from '../hoc/Hoc';
 
 import {
-  Posts
+  Posts,
+  About,
+  Friends,
+  Groups,
+  Pages
 } from '../components/Components';
 
 const UserProfile = () => {
   return (
     <Aux>
-      <h1>User Profile</h1>
+      <About />
+      <Friends />
+      <Groups />
+      <Pages />
       <Posts />
     </Aux>
   );

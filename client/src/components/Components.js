@@ -6,6 +6,13 @@ import CreatePost from './posts/createPost/CreatePost';
 import Posts from './posts/postsContainer/Posts';
 import Info from './user/info/Info';
 import SuggestionBar from './suggestions/SuggestionBar';
+import FriendSuggestions from './suggestions/small/FriendSuggestions';
+import GroupSuggestions from './suggestions/small/GroupSuggestions';
+import PageSuggestions from './suggestions/small/PageSuggestions';
+import About from './user/about/About';
+import Friends from './user/friends/Friends';
+import Groups from './user/groups/Groups';
+import Pages from './user/pages/Pages';
 
 export {
   AuthenticationForm,
@@ -15,5 +22,12 @@ export {
   CreatePost,
   Posts,
   Info,
-  SuggestionBar
+  SuggestionBar,
+  FriendSuggestions,
+  GroupSuggestions,
+  PageSuggestions,
+  About,
+  Friends,
+  Groups,
+  Pages,
 };

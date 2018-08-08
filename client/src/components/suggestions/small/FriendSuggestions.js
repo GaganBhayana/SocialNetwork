@@ -3,10 +3,10 @@ import { connect } from 'react-redux';
 import { PulseLoader } from 'react-spinners';
 import { Link } from 'react-router-dom'
 
-import Avatar from '../../assets/img/avatar.jpg';
+import Avatar from '../../../assets/img/avatar.jpg';
 import classes from './Master.css';
 
-import fetchSuggestions from '../../redux/actions/suggestionsActions';
+import fetchSuggestions from '../../../redux/actions/suggestionsActions';
 
 class FriendSuggestions extends Component {
   componentDidMount() {
@@ -22,27 +22,29 @@ class FriendSuggestions extends Component {
       );
     } else {
       return (
-        this.props.suggestions.map(item => (
-          <div className={classes.FriendSuggestion} key={item._id}>
-            <div className={classes.Img}>
-              <img src={item.img ? item.img : Avatar} width='100%' height='100%' alt='img'/>
-            </div>
-            <div className={classes.Info}>
-              <Link className={classes.Link} to={`/user/${item._id}/${item.name.split(' ').join('-')}`}>
-                {item.name}
-              </Link>
-            </div>
+      <div className={classes.SuggestionsContainer}>
+        {this.props.suggestions.map(item => (
+            <div className={classes.Suggestion} key={item._id}>
+              <div className={classes.Img}>
+                <img src={item.img ? item.img : Avatar} width='100%' height='100%' alt='img'/>
+              </div>
+              <div className={classes.Info}>
+                <Link className={classes.Link} to={`/user/${item._id}/${item.name.split(' ').join('-')}`}>
+                  {item.name}
+                </Link>
+              </div>
           </div>
-        ))
+        ))}
+      </div>
       );
     }
   }
 
   renderLoader = () => {
     return (
-      <div className={classes.Empty}>
-      <PulseLoader loading />
-    </div>
+        <div className={classes.Empty}>
+        <PulseLoader loading />
+      </div>
     );
   }
 

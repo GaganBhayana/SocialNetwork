@@ -10,12 +10,20 @@ import userReducer from './reducers/userReducer';
 import postReducer from './reducers/postReducer';
 import otherUserReducer from './reducers/otherUserReducer'
 import suggestionsReducer from './reducers/suggestionsReducer';
+import createPostReducer from './reducers/createPostReducer';
+import friendReducer from './reducers/friendReducer';
+import pageReducer from './reducers/pageReducer';
+import groupReducer from './reducers/groupReducer';
 
 const rootReducer = combineReducers ({
   otherUser: otherUserReducer,
   currentUser: userReducer,
   posts: postReducer,
-  suggestions: suggestionsReducer
+  suggestions: suggestionsReducer,
+  createPost: createPostReducer,
+  friends: friendReducer,
+  groups: groupReducer,
+  pages: pageReducer
 });
 
 const store = createStore(

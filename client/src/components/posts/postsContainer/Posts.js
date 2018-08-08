@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
-import { RingLoader } from 'react-spinners';
+import { Instagram } from 'react-content-loader';
 
 import fetchPosts, {
   deletePost
@@ -52,9 +52,9 @@ class Posts extends Component {
     let match = this.props.match;
     let params = {};
 
-    if (match.path === '/user/:id') {
+    if (match.path === '/user/:id/:name') {
       params.id = match.params.id;
-    } else if (match.path === '/group/:id' || match.path === '/page/:id') {
+    } else if (match.path === '/group/:id/:name' || match.path === '/page/:id/:name') {
       params.parent = match.prams.id;
     } else if (match.path === '/me') {
       params.id = this.props.userId;
@@ -93,27 +93,30 @@ class Posts extends Component {
   }
 
   renderPosts = () => {
-    const posts = (
-      this.props.posts.map((post, index) =>
-        <Post
-          key={index}
-          showMenu={post.owner === this.props.userId}
-          post={post}
-          index={index}
-          toggleDeleteModal={this.toggleDeleteModal.bind(this, index, post._id)}
-          handleMouseEnter={this.handleMouseEnter.bind(this, post.owner)}
-          handleMouseLeave={this.handleMouseLeave}
-          userId={this.props.userId}
-          Info={this.state.showOtherUserInfo ? <Info {...this.props.otherUser}/> : null}/>
+    const posts = this.props.posts.map((post, index) => (
+      <Post
+        key={index}
+        showMenu={post.owner === this.props.userId}
+        post={post}
+        index={index}
+        toggleDeleteModal={this.toggleDeleteModal.bind(this, index, post._id)}
+        handleMouseEnter={this.handleMouseEnter.bind(this, post.owner)}
+        handleMouseLeave={this.handleMouseLeave}
+        userId={this.props.userId}
+        Info={this.state.showOtherUserInfo ? <Info {...this.props.otherUser}/> : null}/>
     ));
 
-    return (
-      <div className={classes.PostsContainer}>
-        {this.props.loading ?
-        <RingLoader loading /> :
-        posts}
-      </div>
-    );
+    return (this.props.loading ?
+            <div className={classes.PostsContainer}>
+              <Instagram className={classes.Loader}/>
+              <Instagram className={classes.Loader}/>
+              <Instagram className={classes.Loader}/>
+            </div> :
+          this.props.posts.length ?
+            <div className={classes.PostsContainer}>
+              {posts}
+            </div> :
+          <div className={classes.NoPost}>No post to show</div>);
   }
 
   renderModals = () => {

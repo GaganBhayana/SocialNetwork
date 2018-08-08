@@ -1,5 +1,7 @@
 //LOADING MODELS
 const User = require('../models/user');
+const Group = require('../models/group');
+const Page = require('../models/page');
 
 
 //LOADING DEPENDENCIES
@@ -68,6 +70,92 @@ router.get('/friends', authenticate, (req, res) => {
       res.status(500)
         .send();
     })
+});
+
+
+//FETCHING GROUPS
+router.get('/groups', authenticate, (req, res) => {
+  let id = req.user._id;
+
+  if (req.query.id) {
+    id = req.query.id;
+
+    User.findById(id)
+      .then(user => {
+        return Group.find({
+          _id: {
+            $in: user.groups
+          }
+        });
+      })
+      .then(groups => {
+        res.status(200)
+          .json(groups);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500)
+          .send();
+      });
+  } else {
+    Group.find({
+      _id: {
+        $in: req.user.groups
+      }
+    })
+      .then(groups => {
+        res.status(200)
+          .json(groups);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500)
+          .send();
+      });
+  }
+});
+
+
+//FETCHING PAGES
+router.get('/pages', authenticate, (req, res) => {
+  let id = req.user._id;
+
+  if (req.query.id) {
+    id = req.query.id;
+
+    User.findById(id)
+      .then(user => {
+        return Page.find({
+          _id: {
+            $in: user.pages
+          }
+        });
+      })
+      .then(pages => {
+        res.status(200)
+          .json(pages);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500)
+          .send();
+      });
+  } else {
+    Page.find({
+      _id: {
+        $in: req.user.pages
+      }
+    })
+      .then(pages => {
+        res.status(200)
+          .send();
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500)
+          .send();
+      });
+  }
 });
 
 

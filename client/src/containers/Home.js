@@ -4,7 +4,8 @@ import AuthService from '../utils/authService';
 
 import {
   CreatePost,
-  Posts
+  Posts,
+  FriendSuggestions
 } from '../components/Components';
 
 import {
@@ -22,6 +23,7 @@ class Home extends Component {
     return (
       <Aux>
         <CreatePost />
+        <FriendSuggestions />
         <Posts />
       </Aux>
     );

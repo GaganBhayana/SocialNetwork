@@ -2,9 +2,9 @@ import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { Button } from 'mdbreact';
+import { PulseLoader } from 'react-spinners';
 
-import AuthService from '../../../utils/authService';
-import axios from '../../../utils/axios';
+import createPost from '../../../redux/actions/createPostActions';
 import { Aux } from '../../../hoc/Hoc';
 import { Notifications } from '../../Components';
 
@@ -17,12 +17,24 @@ class CreatePost extends Component {
   constructor(props) {
     super(props);
 
-    this.Auth = new AuthService();
     this.state = {
       content: '',
       img: '',
-      loading: 'false',
       alerts: [],
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.success !== nextProps.success && nextProps.success) {
+      this.setState({
+        alerts: [{message: 'Post Submitted', type:'success'}]
+      });
+      let me = 'true';
+      this.props.dispatch(fetchPosts({me}));
+    } else if (this.props.error !== nextProps.error && nextProps.error) {
+      this.setState({
+        alerts: [{message: 'Something went wrong', type: 'error'}]
+      });
     }
   }
 
@@ -46,49 +58,11 @@ class CreatePost extends Component {
       return;
     }
 
-    this.setState({
-      loading: true
-    });
-
-    axios({
-      method: 'post',
-      url: '/post',
-      data: {
-        content: this.state.content,
-        img: this.state.img,
-        owner: this.props.userId
-      },
-      headers: {
-        'x-access-token': this.Auth.getToken()
-      }
-    })
-      .then(res => {
-        let alerts = [{
-          message: 'Post submitted',
-          type: 'success'
-        }];
-
-        this.setState({
-          content: '',
-          img: '',
-          loading: false,
-          alerts: alerts
-        });
-
-        this.props.dispatch(fetchPosts({}));
-      })
-      .catch(err => {
-        console.log(err);
-        let alerts = [{
-          message: 'Connection error',
-          type: 'error'
-        }];
-
-        this.setState({
-          loading: false,
-          alerts: alerts
-        });
-      });
+    this.props.dispatch(createPost(null, {
+      owner: this.props.userId,
+      content: this.state.content,
+      img: this.state.img
+    }));
   }
 
   handleChange = (event) => {
@@ -111,6 +85,16 @@ class CreatePost extends Component {
     } else {
       ImgStyle.display = 'none';
     }
+
+    const disabledButton = (
+      <Button
+        className={classes.PostButton}
+        onClick={this.handleSubmit}
+        disabled>
+          <PulseLoader loading />
+      </Button>
+    );
+
     return (
       <Aux>
         <Notifications
@@ -145,11 +129,13 @@ class CreatePost extends Component {
               width='auto'
               alt='img'/>
           </div>
-          <Button
-            className={classes.PostButton}
-            onClick={this.handleSubmit}>
-            Post
-          </Button>
+          {this.props.loading?
+            disabledButton :
+            <Button
+              className={classes.PostButton}
+              onClick={this.handleSubmit}>
+              Post
+            </Button>}
         </div>
       </Aux>
     );
@@ -157,7 +143,10 @@ class CreatePost extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  userId: state.currentUser.user._id
+  userId: state.currentUser.user._id,
+  loading: state.createPost.loading,
+  error: state.createPost.error,
+  success: state.createPost.success,
 });
 
 export default connect(mapStateToProps)(withRouter(CreatePost));
